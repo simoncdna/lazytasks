@@ -4,8 +4,9 @@ use crossterm::event::{self, Event};
 use ratatui::{
     DefaultTerminal, Frame,
     layout::{Constraint, Direction, Layout},
-    widgets::{Block, BorderType, Borders},
 };
+
+mod components;
 
 fn main() -> Result<()> {
     let terminal = ratatui::init();
@@ -29,18 +30,6 @@ fn render(frame: &mut Frame) {
         .constraints(vec![Constraint::Percentage(30), Constraint::Percentage(70)])
         .split(frame.area());
 
-    let main_title = "Context View";
-    let main_view = Block::new()
-        .title(main_title)
-        .borders(Borders::ALL)
-        .border_type(BorderType::Rounded);
-
-    let task_title = "Tasks";
-    let tasks_view = Block::new()
-        .title(task_title)
-        .borders(Borders::ALL)
-        .border_type(BorderType::Rounded);
-
-    frame.render_widget(tasks_view, layout[0]);
-    frame.render_widget(main_view, layout[1]);
+    components::tasks::render(frame, layout[0]);
+    components::main_view::render(frame, layout[1]);
 }
