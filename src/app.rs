@@ -62,7 +62,7 @@ impl App {
             .split(frame.area());
 
         components::tasks::render(frame, layout[0], self);
-        components::main_view::render(frame, layout[1]);
+        components::main_view::render(frame, layout[1], self);
     }
 
     fn handle_key_event(&mut self) {
