@@ -2,12 +2,10 @@ use std::io::Result;
 
 use ratatui::{
     DefaultTerminal, Frame,
-    crossterm::{self, event::Event},
     layout::{Constraint, Direction, Layout},
 };
-use tui_input::backend::crossterm::EventHandler;
 
-use crate::{components, state};
+use crate::{components, keybindings::handle_key_event, state};
 use crate::{models, state::ModalState};
 
 pub struct App {
@@ -51,7 +49,7 @@ impl App {
         while !self.exit {
             terminal.draw(|frame| self.render(frame))?;
             let event = ratatui::crossterm::event::read()?;
-            self.handle_key_event(&event);
+            handle_key_event(self, &event);
         }
 
         Ok(())
@@ -77,70 +75,6 @@ impl App {
                 components::remove_task::render(frame, selected_option);
             }
             None => {}
-        }
-    }
-
-    fn handle_key_event(&mut self, event: &Event) {
-        if let crossterm::event::Event::Key(key) = event {
-            match &mut self.state.active_modal {
-                Some(ModalState::CreateTask { input }) => match key.code {
-                    crossterm::event::KeyCode::Esc => {
-                        self.state.close_modal();
-                    }
-                    crossterm::event::KeyCode::Enter => {
-                        let new_task = models::task::Task::new(
-                            self.tasks.len(),
-                            input.value().to_string(),
-                            "".to_string(),
-                        );
-                        self.tasks.push(new_task);
-                        self.state.close_modal();
-                        self.state.tasks_list_state.select(Some(0));
-                    }
-                    _ => {
-                        input.handle_event(&event);
-                    }
-                },
-                Some(ModalState::DeleteTask {
-                    index,
-                    selected_option,
-                }) => match key.code {
-                    crossterm::event::KeyCode::Esc => {
-                        self.state.close_modal();
-                    }
-                    crossterm::event::KeyCode::Enter => {
-                        let current_option_index = selected_option.selected();
-
-                        if current_option_index == Some(0) {
-                            self.tasks.remove(*index);
-                            self.state.close_modal();
-                        } else {
-                            self.state.close_modal();
-                        }
-                    }
-                    crossterm::event::KeyCode::Char('j') => {
-                        selected_option.select_next();
-                    }
-                    crossterm::event::KeyCode::Char('k') => {
-                        selected_option.select_previous();
-                    }
-                    _ => {}
-                },
-                None => match key.code {
-                    crossterm::event::KeyCode::Char('c') => self.state.open_create_task(),
-                    crossterm::event::KeyCode::Char('q') => self.exit = true,
-                    crossterm::event::KeyCode::Char('d') => {
-                        self.state.open_delete_task();
-                    }
-                    crossterm::event::KeyCode::Char('j') => {
-                        self.state.select_next_task(self.tasks.len());
-                    }
-                    crossterm::event::KeyCode::Char('k') => {
-                        self.state.select_previous_task();
-                    }
-                    _ => {}
-                },
-            }
         }
     }
 }
