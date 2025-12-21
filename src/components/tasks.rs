@@ -13,7 +13,7 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
         .tasks
         .iter()
         .map(|task| ListItem::new(task.title.clone()));
-    let highlighted_style = if app.state.show_popup {
+    let highlighted_style = if app.state.active_modal.is_some() {
         Style::default()
     } else {
         Style::default()
@@ -21,7 +21,7 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
             .fg(Color::White)
             .add_modifier(Modifier::BOLD)
     };
-    let border_color = if app.state.show_popup {
+    let border_color = if app.state.active_modal.is_some() {
         Color::White
     } else {
         Color::Green

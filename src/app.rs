@@ -5,9 +5,10 @@ use ratatui::{
     crossterm::{self, event::Event},
     layout::{Constraint, Direction, Layout},
 };
+use tui_input::backend::crossterm::EventHandler;
 
-use crate::models;
 use crate::{components, state};
+use crate::{models, state::ModalState};
 
 pub struct App {
     pub exit: bool,
@@ -65,40 +66,71 @@ impl App {
         components::tasks::render(frame, layout[0], self);
         components::main_view::render(frame, layout[1], self);
 
-        if self.state.show_popup {
-            components::create_task::render(frame, &self.state.input);
+        match &mut self.state.active_modal {
+            Some(ModalState::CreateTask { input }) => {
+                components::create_task::render(frame, input);
+            }
+            Some(ModalState::DeleteTask {
+                index: _,
+                selected_option,
+            }) => {
+                components::remove_task::render(frame, selected_option);
+            }
+            None => {}
         }
     }
 
     fn handle_key_event(&mut self, event: &Event) {
         if let crossterm::event::Event::Key(key) = event {
-            if self.state.show_popup {
-                match key.code {
+            match &mut self.state.active_modal {
+                Some(ModalState::CreateTask { input }) => match key.code {
                     crossterm::event::KeyCode::Esc => {
-                        self.state.toggle_popup();
-                        self.state.reset_input()
+                        self.state.close_modal();
                     }
                     crossterm::event::KeyCode::Enter => {
                         let new_task = models::task::Task::new(
                             self.tasks.len(),
-                            self.state.input.value().to_string(),
+                            input.value().to_string(),
                             "".to_string(),
                         );
                         self.tasks.push(new_task);
-                        self.state.toggle_popup();
-                        self.state.reset_input()
+                        self.state.close_modal();
+                        self.state.tasks_list_state.select(Some(0));
                     }
                     _ => {
-                        self.state.handle_event(&event);
+                        input.handle_event(&event);
                     }
-                }
-            } else {
-                match key.code {
-                    crossterm::event::KeyCode::Char('c') => self.state.toggle_popup(),
+                },
+                Some(ModalState::DeleteTask {
+                    index,
+                    selected_option,
+                }) => match key.code {
+                    crossterm::event::KeyCode::Esc => {
+                        self.state.close_modal();
+                    }
+                    crossterm::event::KeyCode::Enter => {
+                        let current_option_index = selected_option.selected();
+
+                        if current_option_index == Some(0) {
+                            self.tasks.remove(*index);
+                            self.state.close_modal();
+                        } else {
+                            self.state.close_modal();
+                        }
+                    }
+                    crossterm::event::KeyCode::Char('j') => {
+                        selected_option.select_next();
+                    }
+                    crossterm::event::KeyCode::Char('k') => {
+                        selected_option.select_previous();
+                    }
+                    _ => {}
+                },
+                None => match key.code {
+                    crossterm::event::KeyCode::Char('c') => self.state.open_create_task(),
                     crossterm::event::KeyCode::Char('q') => self.exit = true,
                     crossterm::event::KeyCode::Char('d') => {
-                        let current_task = self.state.tasks_list_state.selected().unwrap();
-                        self.tasks.remove(current_task);
+                        self.state.open_delete_task();
                     }
                     crossterm::event::KeyCode::Char('j') => {
                         self.state.select_next_task(self.tasks.len());
@@ -107,7 +139,7 @@ impl App {
                         self.state.select_previous_task();
                     }
                     _ => {}
-                }
+                },
             }
         }
     }

@@ -1,16 +1,22 @@
-use ratatui::{crossterm::event::Event, widgets::ListState};
-use tui_input::{Input, backend::crossterm::EventHandler};
+use ratatui::widgets::ListState;
+use tui_input::Input;
 
 /// The application global state
 pub struct AppState {
     /// State of the task list (selected, scroll)
     pub tasks_list_state: ListState,
 
-    /// State of opening a modal
-    pub show_popup: bool,
+    pub active_modal: Option<ModalState>,
+}
 
-    /// State of the creating task input
-    pub input: Input,
+pub enum ModalState {
+    CreateTask {
+        input: Input,
+    },
+    DeleteTask {
+        index: usize,
+        selected_option: ListState,
+    },
 }
 
 impl AppState {
@@ -23,8 +29,7 @@ impl AppState {
 
         AppState {
             tasks_list_state: tasks_list_state,
-            show_popup: false,
-            input: Input::default(),
+            active_modal: None,
         }
     }
 
@@ -46,16 +51,22 @@ impl AppState {
         }
     }
 
-    pub fn toggle_popup(&mut self) {
-        self.show_popup = !self.show_popup
+    pub fn open_create_task(&mut self) {
+        self.active_modal = Some(ModalState::CreateTask {
+            input: Input::default(),
+        })
     }
 
-    /// handle key event to fill input
-    pub fn handle_event(&mut self, event: &Event) {
-        self.input.handle_event(event);
+    pub fn open_delete_task(&mut self) {
+        let mut option_list_state = ListState::default();
+        option_list_state.select(Some(0));
+        self.active_modal = Some(ModalState::DeleteTask {
+            index: self.tasks_list_state.selected().unwrap(),
+            selected_option: option_list_state,
+        })
     }
 
-    pub fn reset_input(&mut self) {
-        self.input.reset();
+    pub fn close_modal(&mut self) {
+        self.active_modal = None
     }
 }
