@@ -51,6 +51,17 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
             },
             None => match key.code {
                 crossterm::event::KeyCode::Char('c') => app.state.open_create_task(),
+                crossterm::event::KeyCode::Char('y') => {
+                    let current_task_index = app.state.tasks_list_state.selected();
+                    if let Some((_, task)) = app
+                        .tasks
+                        .iter_mut()
+                        .enumerate()
+                        .find(|(index, _)| Some(*index) == current_task_index)
+                    {
+                        task.completed = !task.completed;
+                    }
+                }
                 crossterm::event::KeyCode::Char('q') => app.exit = true,
                 crossterm::event::KeyCode::Char('d') => {
                     app.state.open_delete_task();

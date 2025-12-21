@@ -2,6 +2,7 @@ use ratatui::{
     Frame,
     layout::Rect,
     style::{Color, Modifier, Style},
+    text::Span,
     widgets::{Block, BorderType, Borders, List, ListItem},
 };
 
@@ -9,10 +10,17 @@ use crate::app::App;
 
 pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
     let task_title = " Tasks ";
-    let list_items = app
-        .tasks
-        .iter()
-        .map(|task| ListItem::new(task.title.clone()));
+    let list_items = app.tasks.iter().map(|task| {
+        let span = if task.completed {
+            Span::styled(
+                task.title.clone(),
+                Style::default().add_modifier(Modifier::CROSSED_OUT),
+            )
+        } else {
+            Span::raw(task.title.clone())
+        };
+        ListItem::new(span)
+    });
     let highlighted_style = if app.state.active_modal.is_some() {
         Style::default()
     } else {

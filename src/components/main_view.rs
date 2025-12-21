@@ -16,6 +16,8 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
                 Line::from(format!("ID: {}", task.id)),
                 Line::from(format!("TITLE: {}", task.title)),
                 Line::from(format!("DESCRIPTION: {}", task.description)),
+                Line::from(format!("COMPLETED: {}", task.completed)),
+                Line::from(format!("CREATED_AT: {}", task.created_at)),
             ]
         } else {
             vec![Line::from("Task not found")]
