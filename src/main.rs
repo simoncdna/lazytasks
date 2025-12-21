@@ -5,6 +5,7 @@ mod components;
 mod keybindings;
 mod models;
 mod state;
+mod storage;
 
 fn main() -> Result<()> {
     let mut terminal = ratatui::init();

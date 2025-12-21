@@ -17,6 +17,7 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                         "".to_string(),
                     );
                     app.tasks.push(new_task);
+                    app.storage.save(&app.tasks);
                     app.state.close_modal();
                     app.state.tasks_list_state.select(Some(0));
                 }
@@ -36,6 +37,7 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
 
                     if current_option_index == Some(0) {
                         app.tasks.remove(*index);
+                        app.storage.save(&app.tasks);
                         app.state.close_modal();
                     } else {
                         app.state.close_modal();
@@ -61,6 +63,7 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                     {
                         task.completed = !task.completed;
                     }
+                    app.storage.save(&app.tasks);
                 }
                 crossterm::event::KeyCode::Char('q') => app.exit = true,
                 crossterm::event::KeyCode::Char('d') => {
