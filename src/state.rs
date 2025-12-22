@@ -13,6 +13,9 @@ pub enum ModalState {
     CreateTask {
         input: Input,
     },
+    EditTask {
+        input: Input,
+    },
     DeleteTask {
         index: usize,
         selected_option: ListState,
@@ -54,6 +57,12 @@ impl AppState {
     pub fn open_create_task(&mut self) {
         self.active_modal = Some(ModalState::CreateTask {
             input: Input::default(),
+        })
+    }
+
+    pub fn open_edit_task(&mut self, current_value: String) {
+        self.active_modal = Some(ModalState::EditTask {
+            input: Input::from(current_value),
         })
     }
 

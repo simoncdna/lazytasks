@@ -56,6 +56,9 @@ impl App {
             Some(ModalState::CreateTask { input }) => {
                 components::create_task::render(frame, input);
             }
+            Some(ModalState::EditTask { input }) => {
+                components::edit_task::render(frame, input);
+            }
             Some(ModalState::DeleteTask {
                 index: _,
                 selected_option,

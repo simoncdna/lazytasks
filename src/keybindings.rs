@@ -25,6 +25,30 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                     input.handle_event(&event);
                 }
             },
+            Some(ModalState::EditTask { input }) => match key.code {
+                crossterm::event::KeyCode::Esc => {
+                    app.state.close_modal();
+                }
+                crossterm::event::KeyCode::Enter => {
+                    let new_title = input.value().trim();
+                    if !new_title.is_empty() {
+                        let current_task_index = app.state.tasks_list_state.selected();
+                        if let Some((_, task)) = app
+                            .tasks
+                            .iter_mut()
+                            .enumerate()
+                            .find(|(index, _)| Some(*index) == current_task_index)
+                        {
+                            task.title = new_title.to_string();
+                        }
+                        app.storage.save(&app.tasks);
+                    }
+                    app.state.close_modal();
+                }
+                _ => {
+                    input.handle_event(&event);
+                }
+            },
             Some(ModalState::DeleteTask {
                 index,
                 selected_option,
@@ -53,6 +77,17 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
             },
             None => match key.code {
                 crossterm::event::KeyCode::Char('c') => app.state.open_create_task(),
+                crossterm::event::KeyCode::Char('e') => {
+                    let current_task_index = app.state.tasks_list_state.selected();
+                    if let Some((_, task)) = app
+                        .tasks
+                        .iter()
+                        .enumerate()
+                        .find(|(index, _)| Some(*index) == current_task_index)
+                    {
+                        app.state.open_edit_task(task.title.clone());
+                    }
+                }
                 crossterm::event::KeyCode::Char('y') => {
                     let current_task_index = app.state.tasks_list_state.selected();
                     if let Some((_, task)) = app
