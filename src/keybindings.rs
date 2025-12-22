@@ -11,15 +11,17 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                     app.state.close_modal();
                 }
                 crossterm::event::KeyCode::Enter => {
-                    let new_task = models::task::Task::new(
-                        app.tasks.len(),
-                        input.value().to_string(),
-                        "".to_string(),
-                    );
-                    app.tasks.push(new_task);
-                    app.storage.save(&app.tasks);
+                    let title = input.value().trim();
+                    if !title.is_empty() {
+                        let new_task = models::task::Task::new(
+                            app.tasks.len(),
+                            input.value().to_string(),
+                            "".to_string(),
+                        );
+                        app.tasks.push(new_task);
+                        app.storage.save(&app.tasks);
+                    }
                     app.state.close_modal();
-                    app.state.tasks_list_state.select(Some(0));
                 }
                 _ => {
                     input.handle_event(&event);
