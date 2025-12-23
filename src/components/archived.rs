@@ -6,7 +6,7 @@ use ratatui::{
     widgets::{Block, BorderType, Borders, List, ListItem},
 };
 
-use crate::{app::App, models::task::Task, state::PanelState};
+use crate::{app::App, components::scrollbar, models::task::Task, state::PanelState};
 
 pub fn render(frame: &mut Frame, area: Rect, app: &mut App, tasks: &[Task]) {
     let is_active = app.state.active_panel == PanelState::ArchivedTasks;
@@ -47,4 +47,10 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App, tasks: &[Task]) {
         .highlight_style(highlighted_style);
 
     frame.render_stateful_widget(tasks_view, area, &mut app.state.archived_tasks_list_state);
+    scrollbar::render(
+        frame,
+        area,
+        tasks.len(),
+        app.state.archived_tasks_list_state.offset(),
+    );
 }
