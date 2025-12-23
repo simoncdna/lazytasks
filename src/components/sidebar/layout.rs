@@ -3,11 +3,7 @@ use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
 };
 
-use crate::{
-    app::App,
-    components::{self},
-    models::task::Task,
-};
+use crate::{app::App, components::sidebar, models::task::Task};
 
 pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
     let sidebar = Layout::default()
@@ -29,6 +25,6 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
         .cloned()
         .collect();
 
-    components::tasks::render(frame, sidebar[0], app, &active_tasks);
-    components::archived::render(frame, sidebar[1], app, &archived_tasks);
+    sidebar::active_tasks::render(frame, sidebar[0], app, &active_tasks);
+    sidebar::archived_tasks::render(frame, sidebar[1], app, &archived_tasks);
 }

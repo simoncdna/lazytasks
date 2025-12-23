@@ -4,10 +4,12 @@ use ratatui::{
     widgets::{List, ListItem, ListState},
 };
 
-use crate::components::modal::Modal;
+use crate::components::shared;
 
 pub fn render(frame: &mut Frame, selected_option: &mut ListState) {
-    let area = Modal::new("Delete confirmation").height(4).render(frame);
+    let area = shared::modal::Modal::new("Delete confirmation")
+        .height(4)
+        .render(frame);
     let list_items: Vec<ListItem> = vec![ListItem::from("Delete task"), ListItem::from("Cancel")];
     let delete_options = List::new(list_items).highlight_style(
         Style::default()
