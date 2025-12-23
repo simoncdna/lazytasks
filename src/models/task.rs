@@ -21,7 +21,6 @@ impl Task {
             completed: false,
             description: String::new(),
             archived: false,
-            description,
         };
     }
 }

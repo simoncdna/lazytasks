@@ -9,8 +9,8 @@ use ratatui::{
 use crate::{app::App, models::task::Task, state::PanelState};
 
 pub fn render(frame: &mut Frame, area: Rect, app: &mut App, tasks: &[Task]) {
-    let is_active = app.state.active_panel == PanelState::ActiveTasks;
-    let task_title = " Tasks ";
+    let is_active = app.state.active_panel == PanelState::ArchivedTasks;
+    let task_title = " Archived ";
     let list_items = tasks.iter().map(|task| {
         let span = if task.completed {
             Span::styled(
@@ -46,5 +46,5 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App, tasks: &[Task]) {
         )
         .highlight_style(highlighted_style);
 
-    frame.render_stateful_widget(tasks_view, area, &mut app.state.tasks_list_state);
+    frame.render_stateful_widget(tasks_view, area, &mut app.state.archived_tasks_list_state);
 }
