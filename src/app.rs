@@ -56,11 +56,11 @@ impl App {
             Some(ModalState::CreateTask { input }) => {
                 components::create_task::render(frame, input);
             }
-            Some(ModalState::EditTask { input }) => {
+            Some(ModalState::EditTask { task_id: _, input }) => {
                 components::edit_task::render(frame, input);
             }
             Some(ModalState::DeleteTask {
-                index: _,
+                task_id: _,
                 selected_option,
             }) => {
                 components::remove_task::render(frame, selected_option);

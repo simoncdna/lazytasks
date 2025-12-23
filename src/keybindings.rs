@@ -13,11 +13,7 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                 crossterm::event::KeyCode::Enter => {
                     let title = input.value().trim();
                     if !title.is_empty() {
-                        let new_task = models::task::Task::new(
-                            app.tasks.len(),
-                            input.value().to_string(),
-                            "".to_string(),
-                        );
+                        let new_task = models::task::Task::new(input.value());
                         app.tasks.push(new_task);
                         app.storage.save(&app.tasks);
                     }
@@ -27,20 +23,14 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                     input.handle_event(&event);
                 }
             },
-            Some(ModalState::EditTask { input }) => match key.code {
+            Some(ModalState::EditTask { task_id, input }) => match key.code {
                 crossterm::event::KeyCode::Esc => {
                     app.state.close_modal();
                 }
                 crossterm::event::KeyCode::Enter => {
                     let new_title = input.value().trim();
                     if !new_title.is_empty() {
-                        let current_task_index = app.state.tasks_list_state.selected();
-                        if let Some((_, task)) = app
-                            .tasks
-                            .iter_mut()
-                            .enumerate()
-                            .find(|(index, _)| Some(*index) == current_task_index)
-                        {
+                        if let Some(task) = app.tasks.iter_mut().find(|task| task.id == *task_id) {
                             task.title = new_title.to_string();
                         }
                         app.storage.save(&app.tasks);
@@ -52,7 +42,7 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                 }
             },
             Some(ModalState::DeleteTask {
-                index,
+                task_id,
                 selected_option,
             }) => match key.code {
                 crossterm::event::KeyCode::Esc => {
@@ -62,7 +52,7 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                     let current_option_index = selected_option.selected();
 
                     if current_option_index == Some(0) {
-                        app.tasks.remove(*index);
+                        app.tasks.retain(|t| t.id != *task_id);
                         app.storage.save(&app.tasks);
                         app.state.close_modal();
                     } else {
@@ -87,7 +77,7 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                         .enumerate()
                         .find(|(index, _)| Some(*index) == current_task_index)
                     {
-                        app.state.open_edit_task(task.title.clone());
+                        app.state.open_edit_task(task.id, task.title.clone());
                     }
                 }
                 crossterm::event::KeyCode::Char('y') => {
@@ -104,7 +94,15 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                 }
                 crossterm::event::KeyCode::Char('q') => app.exit = true,
                 crossterm::event::KeyCode::Char('d') => {
-                    app.state.open_delete_task();
+                    let task_index = app.state.tasks_list_state.selected();
+                    if let Some((_, task)) = app
+                        .tasks
+                        .iter()
+                        .enumerate()
+                        .find(|(index, _)| Some(*index) == task_index)
+                    {
+                        app.state.open_delete_task(task.id);
+                    }
                 }
                 crossterm::event::KeyCode::Char('j') => {
                     app.state.select_next_task(app.tasks.len());

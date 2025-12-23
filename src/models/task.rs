@@ -1,9 +1,10 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Task {
-    pub id: usize,
+    pub id: Uuid,
     pub title: String,
     pub created_at: DateTime<Utc>,
     pub completed: bool,
@@ -11,13 +12,13 @@ pub struct Task {
 }
 
 impl Task {
-    pub fn new(id: usize, title: String, description: String) -> Self {
+    pub fn new(title: impl Into<String>) -> Self {
         return Task {
-            id,
-            title,
+            id: Uuid::new_v4(),
+            title: title.into(),
             created_at: Utc::now(),
             completed: false,
-            description,
+            description: String::new(),
         };
     }
 }

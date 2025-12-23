@@ -1,5 +1,6 @@
 use ratatui::widgets::ListState;
 use tui_input::Input;
+use uuid::Uuid;
 
 /// The application global state
 pub struct AppState {
@@ -14,10 +15,11 @@ pub enum ModalState {
         input: Input,
     },
     EditTask {
+        task_id: Uuid,
         input: Input,
     },
     DeleteTask {
-        index: usize,
+        task_id: Uuid,
         selected_option: ListState,
     },
 }
@@ -60,17 +62,18 @@ impl AppState {
         })
     }
 
-    pub fn open_edit_task(&mut self, current_value: String) {
+    pub fn open_edit_task(&mut self, task_id: Uuid, current_value: String) {
         self.active_modal = Some(ModalState::EditTask {
+            task_id,
             input: Input::from(current_value),
         })
     }
 
-    pub fn open_delete_task(&mut self) {
+    pub fn open_delete_task(&mut self, task_id: Uuid) {
         let mut option_list_state = ListState::default();
         option_list_state.select(Some(0));
         self.active_modal = Some(ModalState::DeleteTask {
-            index: self.tasks_list_state.selected().unwrap(),
+            task_id,
             selected_option: option_list_state,
         })
     }
