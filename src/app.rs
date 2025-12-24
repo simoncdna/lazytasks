@@ -50,7 +50,7 @@ impl App {
             .constraints(vec![Constraint::Percentage(30), Constraint::Percentage(70)])
             .split(frame.area());
 
-        components::sidebar::layout::render(frame, layout[0], self);
+        components::sidebar::render(frame, layout[0], self);
         components::main_view::render(frame, layout[1], self);
 
         match &mut self.state.active_modal {
