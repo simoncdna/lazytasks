@@ -69,38 +69,24 @@ impl AppState {
     }
 
     pub fn select_next_task(&mut self, tasks_count: usize) {
-        let current_task = self.active_tasks_state.selected();
+        let current_pannel_state = self.get_selected_panel_state();
+        let current_task = current_pannel_state.selected();
+
         if current_task < Some(tasks_count - 1) {
-            self.active_tasks_state.select_next();
+            current_pannel_state.select_next();
         } else {
-            self.active_tasks_state.select_first();
+            current_pannel_state.select_first();
         }
     }
 
     pub fn select_previous_task(&mut self) {
-        let current_task = self.active_tasks_state.selected();
-        if current_task > Some(0) {
-            self.active_tasks_state.select_previous();
-        } else {
-            self.active_tasks_state.select_last();
-        }
-    }
+        let current_pannel_state = self.get_selected_panel_state();
+        let current_task = current_pannel_state.selected();
 
-    pub fn select_next_archived_task(&mut self, tasks_count: usize) {
-        let current_task = self.archived_tasks_state.selected();
-        if current_task < Some(tasks_count - 1) {
-            self.archived_tasks_state.select_next();
-        } else {
-            self.archived_tasks_state.select_first();
-        }
-    }
-
-    pub fn select_previous_archived_task(&mut self) {
-        let current_task = self.archived_tasks_state.selected();
         if current_task > Some(0) {
-            self.archived_tasks_state.select_previous();
+            current_pannel_state.select_previous();
         } else {
-            self.archived_tasks_state.select_last();
+            current_pannel_state.select_last();
         }
     }
 
@@ -135,10 +121,10 @@ impl AppState {
         })
     }
 
-    pub fn get_selected_list(&self) -> &ListState {
+    pub fn get_selected_panel_state(&mut self) -> &mut ListState {
         match self.active_panel {
-            PanelState::ActiveTasks => &self.active_tasks_state,
-            PanelState::ArchivedTasks => &self.archived_tasks_state,
+            PanelState::ActiveTasks => &mut self.active_tasks_state,
+            PanelState::ArchivedTasks => &mut self.archived_tasks_state,
         }
     }
 

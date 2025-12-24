@@ -103,20 +103,20 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
             },
             None => match key.code {
                 crossterm::event::KeyCode::Char('a') => {
-                    if let Some(task_index) = app.state.get_selected_list().selected() {
+                    if let Some(task_index) = app.state.get_selected_panel_state().selected() {
                         let task = &app.get_selected_tasks()[task_index];
                         app.state.open_archived_task(task.id)
                     }
                 }
                 crossterm::event::KeyCode::Char('c') => app.state.open_create_task(),
                 crossterm::event::KeyCode::Char('e') => {
-                    if let Some(task_index) = app.state.get_selected_list().selected() {
+                    if let Some(task_index) = app.state.get_selected_panel_state().selected() {
                         let task = &app.get_selected_tasks()[task_index];
                         app.state.open_edit_task(task.id, task.title.clone());
                     }
                 }
                 crossterm::event::KeyCode::Char('y') => {
-                    if let Some(task_index) = app.state.get_selected_list().selected() {
+                    if let Some(task_index) = app.state.get_selected_panel_state().selected() {
                         let task = &app.get_selected_tasks()[task_index];
                         if let Some(task) = app.tasks.iter_mut().find(|t| t.id == task.id) {
                             task.completed = !task.completed;
@@ -126,7 +126,7 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                 }
                 crossterm::event::KeyCode::Char('q') => app.exit = true,
                 crossterm::event::KeyCode::Char('d') => {
-                    if let Some(task_index) = app.state.get_selected_list().selected() {
+                    if let Some(task_index) = app.state.get_selected_panel_state().selected() {
                         let task = &app.get_selected_tasks()[task_index];
                         app.state.open_delete_task(task.id);
                     }
@@ -137,12 +137,9 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                         .select_next_task(app.tasks.iter().filter(|t| !t.archived).count()),
                     PanelState::ArchivedTasks => app
                         .state
-                        .select_next_archived_task(app.tasks.iter().filter(|t| t.archived).count()),
+                        .select_next_task(app.tasks.iter().filter(|t| t.archived).count()),
                 },
-                crossterm::event::KeyCode::Char('k') => match app.state.active_panel {
-                    PanelState::ActiveTasks => app.state.select_previous_task(),
-                    PanelState::ArchivedTasks => app.state.select_previous_archived_task(),
-                },
+                crossterm::event::KeyCode::Char('k') => app.state.select_previous_task(),
                 crossterm::event::KeyCode::Tab => {
                     app.state.toggle_active_panel();
                 }
