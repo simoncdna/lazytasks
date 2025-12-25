@@ -11,7 +11,6 @@ use crate::{app::App, components::shared, models::task::Task, state::PanelState}
 pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
     let tasks: Vec<&Task> = app.tasks.iter().filter(|t| !t.archived).collect();
     let is_active = app.state.active_panel == PanelState::ActiveTasks;
-    let task_title = " Tasks ";
     let list_items = tasks.iter().map(|task| {
         let span = if task.completed {
             Span::styled(
@@ -37,17 +36,18 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
         Color::Green
     };
 
+    let current_task_count = if tasks.len() > 0 {
+        app.state.active_tasks_state.selected().unwrap_or(0) + 1
+    } else {
+        0
+    };
     let tasks_view = List::new(list_items)
         .block(
             Block::new()
-                .title(task_title)
+                .title(" Tasks ")
                 .title_bottom(
-                    Line::from(format!(
-                        " {} of {} ",
-                        app.state.active_tasks_state.selected().unwrap_or(0) + 1,
-                        tasks.len()
-                    ))
-                    .right_aligned(),
+                    Line::from(format!(" {} of {} ", current_task_count, tasks.len()))
+                        .right_aligned(),
                 )
                 .borders(Borders::ALL)
                 .border_type(BorderType::Rounded)
