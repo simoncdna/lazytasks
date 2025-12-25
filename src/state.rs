@@ -76,14 +76,14 @@ impl AppState {
         }
     }
 
-    pub fn select_previous_task(&mut self) {
+    pub fn select_previous_task(&mut self, tasks_count: usize) {
         let current_pannel_state = self.get_selected_panel_state();
         let current_task = current_pannel_state.selected();
 
         if current_task > Some(0) {
             current_pannel_state.select_previous();
         } else {
-            current_pannel_state.select_last();
+            current_pannel_state.select(Some(tasks_count - 1));
         }
     }
 

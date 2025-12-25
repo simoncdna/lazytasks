@@ -1,12 +1,9 @@
 use ratatui::{
     Frame,
-    layout::{Alignment, Rect},
+    layout::Rect,
     style::{Color, Modifier, Style},
     text::{Line, Span},
-    widgets::{
-        Block, BorderType, Borders, List, ListItem,
-        block::{Position, Title},
-    },
+    widgets::{Block, BorderType, Borders, List, ListItem},
 };
 
 use crate::{app::App, components::shared, models::task::Task, state::PanelState};

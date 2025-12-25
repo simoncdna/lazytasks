@@ -139,7 +139,14 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                         app.state.select_next_task(app.archived_tasks().len())
                     }
                 },
-                crossterm::event::KeyCode::Char('k') => app.state.select_previous_task(),
+                crossterm::event::KeyCode::Char('k') => match app.state.active_panel {
+                    PanelState::ActiveTasks => {
+                        app.state.select_previous_task(app.active_tasks().len())
+                    }
+                    PanelState::ArchivedTasks => {
+                        app.state.select_previous_task(app.archived_tasks().len())
+                    }
+                },
                 crossterm::event::KeyCode::Tab => {
                     app.state.toggle_active_panel();
                 }
