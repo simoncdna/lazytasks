@@ -21,9 +21,10 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                         app.tasks.push(new_task);
                         app.storage.save(&app.tasks);
                     }
-                    if app.tasks.len() == 1 {
-                        app.state.active_tasks_state.select_last();
-                    }
+
+                    let new_index = app.active_tasks().len() - 1;
+
+                    app.state.active_tasks_state.select(Some(new_index));
                     app.state.close_modal();
                 }
                 _ => {
@@ -63,6 +64,7 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                             task.archived = true;
                         }
                         app.storage.save(&app.tasks);
+                        app.state.archived_tasks_state.select(Some(0));
                     }
 
                     app.state.close_modal();
