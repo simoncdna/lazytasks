@@ -1,3 +1,4 @@
+use chrono::Utc;
 use ratatui::crossterm::{self, event::Event};
 use tui_input::backend::crossterm::EventHandler;
 
@@ -40,6 +41,7 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                     if !new_title.is_empty() {
                         if let Some(task) = app.tasks.iter_mut().find(|task| task.id == *task_id) {
                             task.title = new_title.to_string();
+                            task.updated_at = Some(Utc::now());
                         }
                         app.storage.save(&app.tasks);
                     }
@@ -62,6 +64,7 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                     if current_option_index == Some(0) {
                         if let Some(task) = app.tasks.iter_mut().find(|task| task.id == *task_id) {
                             task.archived = true;
+                            task.updated_at = Some(Utc::now());
                         }
                         app.storage.save(&app.tasks);
                         app.state.archived_tasks_state.select(Some(0));
@@ -122,6 +125,7 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                         let task = app.selected_tasks()[task_index].clone();
                         if let Some(task) = app.tasks.iter_mut().find(|t| t.id == task.id) {
                             task.completed = !task.completed;
+                            task.updated_at = Some(Utc::now());
                         }
                     }
                     app.storage.save(&app.tasks);
