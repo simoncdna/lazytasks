@@ -24,11 +24,18 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
         if let Some(task) = current_task.get(selected_idx) {
             vec![
                 Line::from(format!("ID: {}", task.id)),
-                Line::from(format!("TITLE: {}", task.title)),
-                Line::from(format!("DESCRIPTION: {}", task.description)),
-                Line::from(format!("COMPLETED: {}", task.completed)),
-                Line::from(format!("ARCHIVED: {}", task.archived)),
-                Line::from(format!("CREATED_AT: {}", task.created_at)),
+                Line::from(format!("Title: {}", task.title)),
+                Line::from(format!("Description: {}", task.description)),
+                Line::from(format!("Completed: {}", task.completed)),
+                Line::from(format!("Archived: {}", task.archived)),
+                Line::from(format!("Created_at: {}", task.created_at)),
+                Line::from(format!(
+                    "Updated_at: {}",
+                    match task.updated_at {
+                        Some(value) => value.to_string(),
+                        None => "Not updated".to_string(),
+                    }
+                )),
             ]
         } else {
             vec![Line::from("Task not found")]
