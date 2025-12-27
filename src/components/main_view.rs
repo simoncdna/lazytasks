@@ -28,11 +28,14 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
                 Line::from(format!("Description: {}", task.description)),
                 Line::from(format!("Completed: {}", task.completed)),
                 Line::from(format!("Archived: {}", task.archived)),
-                Line::from(format!("Created_at: {}", task.created_at)),
+                Line::from(format!(
+                    "Created_at: {}",
+                    task.created_at.format("%Y-%m-%d %H:%M:%S")
+                )),
                 Line::from(format!(
                     "Updated_at: {}",
                     match task.updated_at {
-                        Some(value) => value.to_string(),
+                        Some(value) => value.format("%Y-%m-%d %H:%M:%S").to_string(),
                         None => "Not updated".to_string(),
                     }
                 )),
