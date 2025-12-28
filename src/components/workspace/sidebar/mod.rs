@@ -6,7 +6,7 @@ use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
 };
 
-use crate::{app::App, components::sidebar};
+use crate::{app::App, components::workspace::sidebar};
 
 pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
     let sidebar = Layout::default()

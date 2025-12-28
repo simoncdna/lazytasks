@@ -1,4 +1,4 @@
-pub mod main_view;
+pub mod bottom_bar;
 pub mod modals;
 pub mod shared;
-pub mod sidebar;
+pub mod workspace;

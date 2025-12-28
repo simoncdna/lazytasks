@@ -46,12 +46,12 @@ impl App {
 
     fn render(&mut self, frame: &mut Frame) {
         let layout = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints(vec![Constraint::Percentage(30), Constraint::Percentage(70)])
+            .direction(Direction::Vertical)
+            .constraints(vec![Constraint::Min(1), Constraint::Length(1)])
             .split(frame.area());
 
-        components::sidebar::render(frame, layout[0], self);
-        components::main_view::render(frame, layout[1], self);
+        components::workspace::render(frame, layout[0], self);
+        components::bottom_bar::render(frame, layout[1], self);
 
         match &mut self.state.active_modal {
             Some(ModalState::CreateTask { input }) => {

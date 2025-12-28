@@ -115,9 +115,15 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                         app.state.open_archived_task(task.id, task.archived)
                     }
                 }
-                crossterm::event::KeyCode::Char('c') => app.state.open_create_task(),
+                crossterm::event::KeyCode::Char('c') => {
+                    if app.state.active_panel == PanelState::ActiveTasks {
+                        app.state.open_create_task()
+                    }
+                }
                 crossterm::event::KeyCode::Char('e') => {
-                    if let Some(task_index) = app.state.get_selected_panel_state().selected() {
+                    if let Some(task_index) = app.state.get_selected_panel_state().selected()
+                        && app.state.active_panel == PanelState::ActiveTasks
+                    {
                         let task = &app.selected_tasks()[task_index];
                         app.state.open_edit_task(task.id, task.title.clone());
                     }
