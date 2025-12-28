@@ -20,11 +20,6 @@ impl Modal {
         }
     }
 
-    pub fn width(mut self, width: u16) -> Self {
-        self.width = width;
-        self
-    }
-
     pub fn height(mut self, height: u16) -> Self {
         self.height = height;
         self
