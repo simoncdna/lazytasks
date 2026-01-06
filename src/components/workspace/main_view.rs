@@ -1,7 +1,9 @@
+use chrono::Local;
 use ratatui::{
     Frame,
     layout::Rect,
-    text::Line,
+    style::{Color, Modifier, Style},
+    text::{Line, Span},
     widgets::{Block, BorderType, Borders, ListState, Paragraph, Wrap},
 };
 
@@ -20,31 +22,55 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
         ),
     };
 
+    let dim_style = Style::default().fg(Color::DarkGray);
+
     let text = if let Some(selected_idx) = current_list.selected() {
         if let Some(task) = current_task.get(selected_idx) {
-            vec![
-                Line::from(format!("ID: {}", task.id)),
-                Line::from(format!("Title: {}", task.title)),
-                Line::from(format!("Description: {}", task.description)),
-                Line::from(format!("Completed: {}", task.completed)),
-                Line::from(format!("Archived: {}", task.archived)),
-                Line::from(format!(
-                    "Created_at: {}",
-                    task.created_at.format("%Y-%m-%d %H:%M:%S")
+            let updated_at = task
+                .updated_at
+                .map(|d| d.with_timezone(&Local).format("%d/%m/%Y %H:%M").to_string())
+                .unwrap_or_else(|| "-".to_string());
+
+            let mut lines = vec![
+                Line::from(Span::styled("---", dim_style)),
+                Line::from(Span::styled(
+                    format!("ID          : {}", task.id),
+                    dim_style,
                 )),
-                Line::from(format!(
-                    "Updated_at: {}",
-                    match task.updated_at {
-                        Some(value) => value.format("%Y-%m-%d %H:%M:%S").to_string(),
-                        None => "Not updated".to_string(),
-                    }
+                Line::from(Span::styled(
+                    format!(
+                        "Created_at  : {}",
+                        task.created_at.with_timezone(&Local).format("%d/%m/%Y %H:%M")
+                    ),
+                    dim_style,
                 )),
-            ]
+                Line::from(Span::styled(
+                    format!("Updated_at  : {}", updated_at),
+                    dim_style,
+                )),
+                Line::from(Span::styled(
+                    format!("Completed   : {}", task.completed),
+                    dim_style,
+                )),
+                Line::from(Span::styled("---", dim_style)),
+                Line::from(""),
+                Line::from(Span::styled(
+                    format!("# {}", task.title),
+                    Style::default().add_modifier(Modifier::BOLD),
+                )),
+                Line::from(""),
+            ];
+
+            for desc_line in task.description.lines() {
+                lines.push(Line::from(format!("  {}", desc_line)));
+            }
+
+            lines
         } else {
             vec![Line::from("Task not found")]
         }
     } else {
-        vec![Line::from("No task selected")]
+        vec![Line::from(Span::styled("No task selected", dim_style))]
     };
 
     let main_view = Paragraph::new(text)

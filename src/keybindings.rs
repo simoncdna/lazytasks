@@ -1,14 +1,16 @@
 use chrono::Utc;
 use ratatui::crossterm::{self, event::Event};
+
+use ratatui::DefaultTerminal;
 use tui_input::backend::crossterm::EventHandler;
 
 use crate::{
     app::App,
-    models,
+    editor, models,
     state::{ModalState, PanelState},
 };
 
-pub fn handle_key_event(app: &mut App, event: &Event) {
+pub fn handle_key_event(app: &mut App, event: &Event, terminal: &mut DefaultTerminal) {
     if let crossterm::event::Event::Key(key) = event {
         match &mut app.state.active_modal {
             Some(ModalState::CreateTask { input }) => match key.code {
@@ -151,6 +153,33 @@ pub fn handle_key_event(app: &mut App, event: &Event) {
                     {
                         let task = &app.get_current_tasks()[task_index];
                         app.state.open_edit_task(task.id, task.title.clone());
+                    }
+                }
+                crossterm::event::KeyCode::Char('E') => {
+                    if app.state.active_panel == PanelState::ActiveTasks {
+                        let task_id = app
+                            .state
+                            .get_selected_panel_state()
+                            .selected()
+                            .and_then(|idx| app.get_current_tasks().get(idx).map(|t| t.id));
+
+                        if let Some(task_id) = task_id {
+                            if let Some(task_ref) = app.tasks.iter().find(|t| t.id == task_id) {
+                                let update = editor::open_in_editor(task_ref, terminal);
+
+                                // Only apply changes if title is not empty
+                                if !update.title.is_empty() {
+                                    if let Some(task) =
+                                        app.tasks.iter_mut().find(|t| t.id == task_id)
+                                    {
+                                        task.title = update.title;
+                                        task.description = update.description;
+                                        task.updated_at = Some(Utc::now());
+                                    }
+                                    app.storage.save(&app.tasks);
+                                }
+                            }
+                        }
                     }
                 }
                 crossterm::event::KeyCode::Char('y') => {

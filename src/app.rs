@@ -41,7 +41,7 @@ impl App {
         while !self.exit {
             terminal.draw(|frame| self.render(frame))?;
             let event = ratatui::crossterm::event::read()?;
-            handle_key_event(self, &event);
+            handle_key_event(self, &event, terminal);
         }
 
         Ok(())

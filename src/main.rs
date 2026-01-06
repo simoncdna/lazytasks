@@ -2,6 +2,7 @@ use std::io::Result;
 
 mod app;
 mod components;
+mod editor;
 mod keybindings;
 mod models;
 mod state;
