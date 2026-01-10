@@ -8,10 +8,7 @@ use ratatui::{
 
 use crate::{app::App, components::shared, models::Task, state::PanelState};
 
-pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
-    let mut tasks: Vec<&Task> = app.tasks.iter().filter(|t| t.archived).collect();
-    tasks.sort_by(|a, b| b.archived_at.cmp(&a.archived_at));
-
+pub fn render(frame: &mut Frame, area: Rect, app: &mut App, tasks: Vec<Task>) {
     let is_active =
         app.state.active_modal.is_none() && app.state.active_panel == PanelState::ArchivedTasks;
     let selected_index = app.state.archived_tasks_state.selected();

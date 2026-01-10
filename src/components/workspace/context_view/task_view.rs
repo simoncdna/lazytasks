@@ -14,7 +14,7 @@ pub fn render(
     area: Rect,
     title: String,
     current_list: &ListState,
-    tasks: Vec<&Task>,
+    tasks: Vec<Task>,
 ) {
     let dim_style = Style::default().fg(Color::DarkGray);
 

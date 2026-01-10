@@ -86,24 +86,20 @@ impl App {
         }
     }
 
-    pub fn active_tasks(&self) -> Vec<&Task> {
-        let mut tasks: Vec<&Task> = self.tasks.iter().filter(|task| !task.archived).collect();
-        tasks.sort_by(|a, b| match (&a.priority, &b.priority) {
-            (Some(pa), Some(pb)) => pa.cmp(pb),
-            (Some(_), None) => std::cmp::Ordering::Less,
-            (None, Some(_)) => std::cmp::Ordering::Greater,
-            (None, None) => a.created_at.cmp(&b.created_at),
-        });
+    pub fn active_tasks(&self) -> Vec<Task> {
+        let mut tasks = Task::get_active_tasks(&self.tasks);
+        Task::sort_by_priority(&mut tasks);
+
         tasks
     }
 
-    pub fn archived_tasks(&self) -> Vec<&Task> {
-        let mut tasks: Vec<&Task> = self.tasks.iter().filter(|task| task.archived).collect();
-        tasks.sort_by(|a, b| b.archived_at.cmp(&a.archived_at));
+    pub fn archived_tasks(&self) -> Vec<Task> {
+        let mut tasks = Task::get_archived_tasks(&self.tasks);
+        Task::sort_by_archived_date(&mut tasks);
         tasks
     }
 
-    pub fn get_current_tasks(&self) -> Vec<&Task> {
+    pub fn get_current_tasks(&self) -> Vec<Task> {
         match self.state.active_panel {
             state::PanelState::ActiveTasks => self.active_tasks(),
             state::PanelState::ArchivedTasks => self.archived_tasks(),

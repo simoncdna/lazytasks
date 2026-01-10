@@ -5,9 +5,9 @@ use crate::models;
 
 #[derive(Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Priority {
-    High,
-    Medium,
     Low,
+    Medium,
+    High,
 }
 
 impl Priority {
