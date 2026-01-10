@@ -10,6 +10,7 @@ pub struct Task {
     pub title: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: Option<DateTime<Utc>>,
+    pub archived_at: Option<DateTime<Utc>>,
     pub completed: bool,
     pub archived: bool,
     pub description: String,
@@ -23,10 +24,32 @@ impl Task {
             title: title.into(),
             created_at: Utc::now(),
             updated_at: None,
+            archived_at: None,
             completed: false,
             archived: false,
             description: String::new(),
             priority: None,
         };
+    }
+
+    pub fn get_active_tasks(tasks: &[Task]) -> Vec<Task> {
+        tasks.iter().filter(|task| !task.archived).cloned().collect()
+    }
+
+    pub fn get_archived_tasks(tasks: &[Task]) -> Vec<Task> {
+        tasks.iter().filter(|task| task.archived).cloned().collect()
+    }
+
+    pub fn sort_by_priority(tasks: &mut Vec<Task>) {
+        tasks.sort_by(|a, b| match (&a.priority, &b.priority) {
+            (Some(pa), Some(pb)) => pb.cmp(pa),
+            (Some(_), None) => std::cmp::Ordering::Less,
+            (None, Some(_)) => std::cmp::Ordering::Greater,
+            (None, None) => a.created_at.cmp(&b.created_at),
+        });
+    }
+
+    pub fn sort_by_archived_date(tasks: &mut Vec<Task>) {
+        tasks.sort_by(|a, b| b.archived_at.cmp(&a.archived_at));
     }
 }

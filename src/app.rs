@@ -86,15 +86,20 @@ impl App {
         }
     }
 
-    pub fn active_tasks(&self) -> Vec<&Task> {
-        self.tasks.iter().filter(|task| !task.archived).collect()
+    pub fn active_tasks(&self) -> Vec<Task> {
+        let mut tasks = Task::get_active_tasks(&self.tasks);
+        Task::sort_by_priority(&mut tasks);
+
+        tasks
     }
 
-    pub fn archived_tasks(&self) -> Vec<&Task> {
-        self.tasks.iter().filter(|task| task.archived).collect()
+    pub fn archived_tasks(&self) -> Vec<Task> {
+        let mut tasks = Task::get_archived_tasks(&self.tasks);
+        Task::sort_by_archived_date(&mut tasks);
+        tasks
     }
 
-    pub fn get_current_tasks(&self) -> Vec<&Task> {
+    pub fn get_current_tasks(&self) -> Vec<Task> {
         match self.state.active_panel {
             state::PanelState::ActiveTasks => self.active_tasks(),
             state::PanelState::ArchivedTasks => self.archived_tasks(),

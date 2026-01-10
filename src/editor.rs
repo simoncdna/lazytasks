@@ -24,6 +24,10 @@ pub fn render_template(task: &Task) -> String {
         .updated_at
         .map(|d| d.with_timezone(&Local).format("%d/%m/%Y %H:%M").to_string())
         .unwrap_or_else(|| "-".to_string());
+    let archived_at = task
+        .archived_at
+        .map(|d| d.with_timezone(&Local).format("%d/%m/%Y %H:%M").to_string())
+        .unwrap_or_else(|| "-".to_string());
 
     template
         .replace("{title}", &task.title)
@@ -32,6 +36,7 @@ pub fn render_template(task: &Task) -> String {
         .replace("{completed}", &task.completed.to_string())
         .replace("{created_at}", &created_at)
         .replace("{updated_at}", &updated_at)
+        .replace("{archived_at}", &archived_at)
         .replace(
             "{priority}",
             match &task.priority {

@@ -11,11 +11,12 @@
 # ====================
 # TASK INFO
 # ====================
-# ID        : {id}
-# Completed : {completed}
-# Created   : {created_at}
-# Updated   : {updated_at}
-# Priority  : {priority}
+# ID         : {id}
+# Completed  : {completed}
+# Created    : {created_at}
+# Updated    : {updated_at}
+# Archived   : {archived_at}
+# Priority   : {priority}
 
 # ====================
 # EDITABLE

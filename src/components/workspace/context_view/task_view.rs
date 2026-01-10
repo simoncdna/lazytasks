@@ -14,7 +14,7 @@ pub fn render(
     area: Rect,
     title: String,
     current_list: &ListState,
-    tasks: Vec<&Task>,
+    tasks: Vec<Task>,
 ) {
     let dim_style = Style::default().fg(Color::DarkGray);
 
@@ -22,6 +22,10 @@ pub fn render(
         if let Some(task) = tasks.get(selected_idx) {
             let updated_at = task
                 .updated_at
+                .map(|d| d.with_timezone(&Local).format("%d/%m/%Y %H:%M").to_string())
+                .unwrap_or_else(|| "-".to_string());
+            let archived_at = task
+                .archived_at
                 .map(|d| d.with_timezone(&Local).format("%d/%m/%Y %H:%M").to_string())
                 .unwrap_or_else(|| "-".to_string());
 
@@ -42,6 +46,10 @@ pub fn render(
                 )),
                 Line::from(Span::styled(
                     format!("Updated_at  : {}", updated_at),
+                    dim_style,
+                )),
+                Line::from(Span::styled(
+                    format!("Archived_at : {}", archived_at),
                     dim_style,
                 )),
                 Line::from(Span::styled(
