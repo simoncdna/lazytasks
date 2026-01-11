@@ -75,8 +75,10 @@ pub fn render(
                 Line::from(""),
             ];
 
-            for desc_line in task.description.lines() {
-                lines.push(Line::from(format!("  {}", desc_line)));
+            if let Some(description) = &task.description {
+                for desc_line in description.lines() {
+                    lines.push(Line::from(format!("  {}", desc_line)));
+                }
             }
 
             lines

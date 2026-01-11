@@ -1,7 +1,7 @@
 use chrono::Utc;
 use uuid::Uuid;
 
-use crate::app::App;
+use crate::{app::App, db::repositories::TaskRepository};
 
 pub fn toggle_archive_task(app: &mut App, option_idx: Option<usize>, task_ids: Vec<Uuid>) {
     if option_idx == Some(0) {
@@ -13,9 +13,11 @@ pub fn toggle_archive_task(app: &mut App, option_idx: Option<usize>, task_ids: V
                 } else {
                     None
                 };
+
+                TaskRepository::update(&app.db.connection, task);
             }
         });
-        app.storage.save(&app.tasks);
+
         app.selected_tasks.clear();
 
         let count = app.get_current_tasks().len();
