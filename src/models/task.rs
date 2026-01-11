@@ -1,11 +1,10 @@
 use chrono::{DateTime, Utc};
 use rusqlite::Row;
-use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::models::Priority;
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
 pub struct Task {
     pub id: Uuid,
     pub title: String,

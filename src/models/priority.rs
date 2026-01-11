@@ -1,9 +1,8 @@
 use ratatui::style::Color;
-use serde::{Deserialize, Serialize};
 
 use crate::models;
 
-#[derive(Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Priority {
     Low,
     Medium,
