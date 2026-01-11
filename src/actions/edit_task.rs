@@ -1,7 +1,7 @@
 use chrono::Utc;
 use ratatui::DefaultTerminal;
 
-use crate::{app::App, editor, state::PanelState};
+use crate::{app::App, db::repositories::TaskRepository, editor, state::PanelState};
 
 pub fn edit_task(app: &mut App, terminal: &mut DefaultTerminal) {
     if app.state.active_panel == PanelState::ActiveTasks {
@@ -19,10 +19,11 @@ pub fn edit_task(app: &mut App, terminal: &mut DefaultTerminal) {
                 if !update.title.is_empty() {
                     if let Some(task) = app.tasks.iter_mut().find(|t| t.id == task_id) {
                         task.title = update.title;
-                        task.description = update.description;
+                        task.description = Some(update.description);
                         task.updated_at = Some(Utc::now());
+
+                        TaskRepository::update(&app.db.connection, task);
                     }
-                    app.storage.save(&app.tasks);
                 }
             }
         }

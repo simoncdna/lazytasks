@@ -4,11 +4,11 @@ mod actions;
 mod app;
 mod components;
 mod constants;
+mod db;
 mod editor;
 mod keybindings;
 mod models;
 mod state;
-mod storage;
 
 fn main() -> Result<()> {
     let mut terminal = ratatui::init();

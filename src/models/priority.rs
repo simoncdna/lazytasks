@@ -26,4 +26,21 @@ impl Priority {
             models::Priority::Low => Color::Blue,
         }
     }
+
+    pub fn to_str(&self) -> String {
+        match self {
+            Priority::High => String::from("high"),
+            Priority::Medium => String::from("medium"),
+            Priority::Low => String::from("low"),
+        }
+    }
+
+    pub fn from_str(str: &str) -> Option<Self> {
+        match str {
+            "high" => Some(Priority::High),
+            "medium" => Some(Priority::Medium),
+            "low" => Some(Priority::Low),
+            _ => None,
+        }
+    }
 }
