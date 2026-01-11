@@ -18,13 +18,11 @@ impl Db {
 
         let db_path = data_dir.join("tasks.db");
 
-        let connection = Connection::open(&db_path).expect("Couln't open database");
+        let connection = Connection::open(&db_path).expect("Couldn't open database");
 
-        let db = Db {
-            connection: connection,
-        };
+        let db = Db { connection };
 
-        db.init_schema().expect("Couldn't not init schema");
+        db.init_schema().expect("Couldn't init schema");
 
         db
     }
