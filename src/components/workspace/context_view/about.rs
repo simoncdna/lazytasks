@@ -16,7 +16,7 @@ pub fn render(frame: &mut Frame, area: Rect, title: String) {
 
     lines.push(Line::raw(""));
     lines.push(Line::styled(
-        format!("Copyright 2026 Simon Cardona"),
+        "Copyright 2026 Simon Cardona".to_string(),
         Style::default().fg(Color::White),
     ));
     lines.push(Line::raw(""));

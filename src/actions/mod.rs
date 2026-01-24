@@ -1,3 +1,4 @@
+pub mod clean_err_msg;
 pub mod close_modal;
 pub mod create_task;
 pub mod delete_task;
@@ -17,6 +18,7 @@ pub mod toggle_archive_task;
 pub mod toggle_task_completion;
 pub mod toggle_task_selection;
 
+pub use clean_err_msg::clean_err_msg;
 pub use close_modal::close_modal;
 pub use create_task::create_task;
 pub use delete_task::delete_task;

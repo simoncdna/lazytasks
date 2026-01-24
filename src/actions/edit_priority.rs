@@ -1,6 +1,7 @@
+use chrono::Utc;
 use uuid::Uuid;
 
-use crate::{app::App, models::Priority};
+use crate::{app::App, db::repositories::TaskRepository, models::Priority};
 
 pub fn edit_priority(app: &mut App, option_idx: Option<usize>, task_ids: Vec<Uuid>) {
     let priority = match option_idx {
@@ -11,11 +12,18 @@ pub fn edit_priority(app: &mut App, option_idx: Option<usize>, task_ids: Vec<Uui
         _ => return,
     };
 
-    app.tasks.iter_mut().for_each(|task| {
+    for task in app.tasks.iter_mut() {
         if task_ids.contains(&task.id) {
             task.priority = priority.clone();
+            task.updated_at = Some(Utc::now());
+
+            if let Err(e) = TaskRepository::update(&app.db.connection, task) {
+                app.error = Some(e.to_string());
+
+                return;
+            };
         }
-    });
-    app.storage.save(&app.tasks);
+    }
+
     app.selected_tasks.clear();
 }

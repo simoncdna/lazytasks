@@ -1,11 +1,11 @@
 use chrono::Utc;
 use uuid::Uuid;
 
-use crate::app::App;
+use crate::{app::App, db::repositories::TaskRepository};
 
 pub fn toggle_archive_task(app: &mut App, option_idx: Option<usize>, task_ids: Vec<Uuid>) {
     if option_idx == Some(0) {
-        app.tasks.iter_mut().for_each(|task| {
+        for task in app.tasks.iter_mut() {
             if task_ids.contains(&task.id) {
                 task.archived = !task.archived;
                 task.archived_at = if task.archived {
@@ -13,9 +13,15 @@ pub fn toggle_archive_task(app: &mut App, option_idx: Option<usize>, task_ids: V
                 } else {
                     None
                 };
+
+                if let Err(e) = TaskRepository::update(&app.db.connection, task) {
+                    app.error = Some(e.to_string());
+
+                    return;
+                };
             }
-        });
-        app.storage.save(&app.tasks);
+        }
+
         app.selected_tasks.clear();
 
         let count = app.get_current_tasks().len();
@@ -23,12 +29,10 @@ pub fn toggle_archive_task(app: &mut App, option_idx: Option<usize>, task_ids: V
             .state
             .get_selected_panel_state()
             .and_then(|s| s.selected())
+            && idx >= count
+            && let Some(panel_state) = app.state.get_selected_panel_state()
         {
-            if idx >= count {
-                if let Some(panel_state) = app.state.get_selected_panel_state() {
-                    panel_state.select(count.checked_sub(1));
-                }
-            }
+            panel_state.select(count.checked_sub(1));
         }
     }
 }

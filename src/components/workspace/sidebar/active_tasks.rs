@@ -55,7 +55,7 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App, tasks: Vec<Task>) {
         Color::White
     };
 
-    let current_task_count = if tasks.len() > 0 {
+    let current_task_count = if !tasks.is_empty() {
         app.state.active_tasks_state.selected().unwrap_or(0) + 1
     } else {
         0

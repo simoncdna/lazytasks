@@ -1,39 +1,42 @@
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::models::Priority;
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
 pub struct Task {
     pub id: Uuid,
     pub title: String,
+    pub description: Option<String>,
+    pub priority: Option<Priority>,
+    pub completed: bool,
+    pub archived: bool,
     pub created_at: DateTime<Utc>,
     pub updated_at: Option<DateTime<Utc>>,
     pub archived_at: Option<DateTime<Utc>>,
-    pub completed: bool,
-    pub archived: bool,
-    pub description: String,
-    pub priority: Option<Priority>,
 }
 
 impl Task {
     pub fn new(title: impl Into<String>) -> Self {
-        return Task {
+        Task {
             id: Uuid::new_v4(),
             title: title.into(),
+            description: None,
+            priority: None,
+            completed: false,
+            archived: false,
             created_at: Utc::now(),
             updated_at: None,
             archived_at: None,
-            completed: false,
-            archived: false,
-            description: String::new(),
-            priority: None,
-        };
+        }
     }
 
     pub fn get_active_tasks(tasks: &[Task]) -> Vec<Task> {
-        tasks.iter().filter(|task| !task.archived).cloned().collect()
+        tasks
+            .iter()
+            .filter(|task| !task.archived)
+            .cloned()
+            .collect()
     }
 
     pub fn get_archived_tasks(tasks: &[Task]) -> Vec<Task> {

@@ -8,10 +8,10 @@ use uuid::Uuid;
 
 use crate::{
     components,
+    db::{Db, repositories::TaskRepository},
     keybindings::handle_key_event,
     models::Task,
     state,
-    storage::storage::{self, Storage},
 };
 use crate::{models, state::ModalState};
 
@@ -20,20 +20,27 @@ pub struct App {
     pub tasks: Vec<models::Task>,
     pub selected_tasks: Vec<Uuid>,
     pub state: state::AppState,
-    pub storage: Storage,
+    pub db: Db,
+    pub error: Option<String>,
 }
 
 impl App {
     pub fn new() -> Self {
         let state = state::AppState::new();
-        let storage = storage::Storage::new();
+        let db = Db::new();
+
+        let (tasks, error) = match TaskRepository::get_all(&db.connection) {
+            Ok(tasks) => (tasks, None),
+            Err(err) => (vec![], Some(err.to_string())),
+        };
 
         App {
             exit: false,
-            tasks: storage.load(),
             selected_tasks: Vec::new(),
-            storage,
             state,
+            db,
+            tasks,
+            error,
         }
     }
 

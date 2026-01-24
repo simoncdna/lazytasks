@@ -110,6 +110,7 @@ pub fn handle_key_event(app: &mut App, event: &Event, terminal: &mut DefaultTerm
                 crossterm::event::KeyCode::Char('k') => actions::select_previous_task(app),
                 crossterm::event::KeyCode::Char(' ') => actions::toggle_task_selection(app),
                 crossterm::event::KeyCode::Tab => actions::switch_panel(app),
+                crossterm::event::KeyCode::Enter => actions::clean_err_msg(app),
                 _ => {}
             },
         }

@@ -15,6 +15,7 @@ pub struct TaskUpdate {
 
 pub fn render_template(task: &Task) -> String {
     let template = include_str!("template.md");
+    let description = task.description.clone().unwrap_or_default();
     let created_at = task
         .created_at
         .with_timezone(&Local)
@@ -31,7 +32,7 @@ pub fn render_template(task: &Task) -> String {
 
     template
         .replace("{title}", &task.title)
-        .replace("{description}", &task.description)
+        .replace("{description}", &description)
         .replace("{id}", &task.id.to_string())
         .replace("{completed}", &task.completed.to_string())
         .replace("{created_at}", &created_at)

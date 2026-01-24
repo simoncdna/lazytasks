@@ -7,7 +7,7 @@ use ratatui::{
 use crate::components::shared;
 
 pub fn render(frame: &mut Frame, selected_option: &mut ListState) {
-    let area = shared::modal::Modal::new(format!("Edit Priority"))
+    let area = shared::modal::Modal::new("Edit Priority".to_string())
         .height(7)
         .render(frame);
     let list_items: Vec<ListItem> = vec![

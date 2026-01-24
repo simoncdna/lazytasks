@@ -17,6 +17,7 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
         }
         PanelState::About => "",
     };
+
     let bottom_bar = Paragraph::new(help_text).style(Style::default().fg(Color::Blue));
 
     frame.render_widget(bottom_bar, area);
