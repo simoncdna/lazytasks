@@ -8,7 +8,10 @@ use uuid::Uuid;
 
 use crate::{
     components,
-    db::{Db, repositories::TaskRepository},
+    db::{
+        Db,
+        repositories::{SpaceRepository, TaskRepository},
+    },
     keybindings::handle_key_event,
     models::Task,
     state,
@@ -17,6 +20,7 @@ use crate::{models, state::ModalState};
 
 pub struct App {
     pub exit: bool,
+    pub spaces: Vec<models::Space>,
     pub tasks: Vec<models::Task>,
     pub selected_tasks: Vec<Uuid>,
     pub state: state::AppState,
@@ -29,8 +33,13 @@ impl App {
         let state = state::AppState::new();
         let db = Db::new();
 
-        let (tasks, error) = match TaskRepository::get_all(&db.connection) {
+        let (tasks, _) = match TaskRepository::get_all(&db.connection) {
             Ok(tasks) => (tasks, None),
+            Err(err) => (vec![], Some(err.to_string())),
+        };
+
+        let (spaces, space_err) = match SpaceRepository::get_all(&db.connection) {
+            Ok(spaces) => (spaces, None),
             Err(err) => (vec![], Some(err.to_string())),
         };
 
@@ -40,7 +49,8 @@ impl App {
             state,
             db,
             tasks,
-            error,
+            spaces,
+            error: space_err,
         }
     }
 
@@ -88,6 +98,9 @@ impl App {
                 selected_option,
             }) => {
                 components::modals::priority_task::render(frame, selected_option);
+            }
+            Some(ModalState::CreateSpace { input }) => {
+                components::modals::create_task::render(frame, input);
             }
             None => {}
         }

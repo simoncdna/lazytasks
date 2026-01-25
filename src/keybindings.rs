@@ -97,9 +97,24 @@ pub fn handle_key_event(app: &mut App, event: &Event, terminal: &mut DefaultTerm
                 }
                 _ => {}
             },
+            Some(ModalState::CreateSpace { input }) => match key.code {
+                crossterm::event::KeyCode::Esc => actions::close_modal(app),
+                crossterm::event::KeyCode::Enter => {
+                    let title = input.value().trim().to_owned();
+
+                    if !title.is_empty() {
+                        actions::create_space(app, title);
+                    }
+                    actions::close_modal(app);
+                }
+                _ => {
+                    input.handle_event(event);
+                }
+            },
             None => match key.code {
                 crossterm::event::KeyCode::Char('a') => actions::open_archive_modal(app),
-                crossterm::event::KeyCode::Char('c') => actions::open_create_modal(app),
+                crossterm::event::KeyCode::Char('c') => actions::open_create_task_modal(app),
+                crossterm::event::KeyCode::Char('s') => actions::open_create_space_modal(app),
                 crossterm::event::KeyCode::Char('e') => actions::open_edit_title_modal(app),
                 crossterm::event::KeyCode::Char('p') => actions::open_priority_modal(app),
                 crossterm::event::KeyCode::Char('E') => actions::edit_task(app, terminal),

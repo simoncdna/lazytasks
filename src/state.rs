@@ -45,6 +45,9 @@ pub enum ModalState {
         task_ids: Vec<Uuid>,
         selected_option: ListState,
     },
+    CreateSpace {
+        input: Input,
+    },
 }
 
 impl AppState {
@@ -144,6 +147,12 @@ impl AppState {
             PanelState::ArchivedTasks => Some(&mut self.archived_tasks_state),
             PanelState::About => None,
         }
+    }
+
+    pub fn open_create_space(&mut self) {
+        self.active_modal = Some(ModalState::CreateSpace {
+            input: Input::default(),
+        })
     }
 
     pub fn close_modal(&mut self) {
