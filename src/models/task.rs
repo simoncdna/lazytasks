@@ -14,6 +14,7 @@ pub struct Task {
     pub created_at: DateTime<Utc>,
     pub updated_at: Option<DateTime<Utc>>,
     pub archived_at: Option<DateTime<Utc>>,
+    pub space_id: Option<Uuid>,
 }
 
 impl Task {
@@ -28,6 +29,7 @@ impl Task {
             created_at: Utc::now(),
             updated_at: None,
             archived_at: None,
+            space_id: None,
         }
     }
 
