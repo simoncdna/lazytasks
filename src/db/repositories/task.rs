@@ -74,6 +74,7 @@ impl TaskRepository {
 
     fn parse_row(row: &Row) -> Result<Task, Box<dyn Error>> {
         let id: String = row.get("id")?;
+        let space_id: Option<String> = row.get("space_id")?;
         let priority: Option<String> = row.get("priority")?;
         let created_at: String = row.get("created_at")?;
         let updated_at: Option<String> = row.get("updated_at")?;
@@ -93,6 +94,7 @@ impl TaskRepository {
             archived_at: archived_at
                 .map(|s| DateTime::parse_from_rfc3339(&s).map(|d| d.with_timezone(&Utc)))
                 .transpose()?,
+            space_id: space_id.map(|s| Uuid::parse_str(&s)).transpose()?,
         })
     }
 }
