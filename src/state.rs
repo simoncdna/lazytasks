@@ -62,6 +62,10 @@ pub enum ModalState {
         selected_option: ListState,
         is_archived: bool,
     },
+    MoveTask {
+        task_id: Uuid,
+        selected_option: ListState,
+    },
 }
 
 impl AppState {
@@ -194,6 +198,15 @@ impl AppState {
             space_id,
             selected_option: option_list_state,
             is_archived,
+        })
+    }
+
+    pub fn open_move_task(&mut self, task_id: Uuid) {
+        let mut option_list_state = ListState::default();
+        option_list_state.select(Some(0));
+        self.active_modal = Some(ModalState::MoveTask {
+            task_id,
+            selected_option: option_list_state,
         })
     }
 }

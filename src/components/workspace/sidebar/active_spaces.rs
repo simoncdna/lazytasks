@@ -52,11 +52,13 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
                 .border_type(BorderType::Rounded)
                 .border_style(border_color),
         )
-        .highlight_style(
+        .highlight_style(if is_active {
             Style::default()
                 .bg(Color::Blue)
-                .add_modifier(Modifier::BOLD),
-        )
+                .add_modifier(Modifier::BOLD)
+        } else {
+            Style::default()
+        })
         .node_closed_symbol("▶ ")
         .node_open_symbol("▼ ")
         .node_no_children_symbol("  ");

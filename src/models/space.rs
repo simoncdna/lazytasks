@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
+#[derive(Clone)]
 pub struct Space {
     pub id: Uuid,
     pub title: String,

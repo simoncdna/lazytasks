@@ -155,6 +155,27 @@ pub fn handle_key_event(app: &mut App, event: &Event, terminal: &mut DefaultTerm
                 }
                 _ => {}
             },
+            Some(ModalState::MoveTask {
+                task_id,
+                selected_option,
+            }) => match key.code {
+                crossterm::event::KeyCode::Esc => actions::close_modal(app),
+                crossterm::event::KeyCode::Enter => {
+                    let option_idx = selected_option.selected();
+                    let task_id = *task_id;
+                    let spaces: Vec<_> = app.spaces.iter().filter(|s| !s.archived).cloned().collect();
+
+                    actions::move_task(app, option_idx, task_id, &spaces);
+                    actions::close_modal(app);
+                }
+                crossterm::event::KeyCode::Char('j') => {
+                    selected_option.select_next();
+                }
+                crossterm::event::KeyCode::Char('k') => {
+                    selected_option.select_previous();
+                }
+                _ => {}
+            },
             None => match key.code {
                 crossterm::event::KeyCode::Char('a') => {
                     if app.state.active_panel == PanelState::ActiveTasks {
@@ -171,6 +192,7 @@ pub fn handle_key_event(app: &mut App, event: &Event, terminal: &mut DefaultTerm
                 crossterm::event::KeyCode::Char('E') => actions::edit_task(app, terminal),
                 crossterm::event::KeyCode::Char('y') => actions::toggle_task_completion(app),
                 crossterm::event::KeyCode::Char('q') => actions::quit(app),
+                crossterm::event::KeyCode::Char('m') => actions::open_move_task_modal(app),
                 crossterm::event::KeyCode::Char('d') => {
                     if app.state.active_panel == PanelState::ActiveTasks {
                         actions::open_delete_space_modal(app);

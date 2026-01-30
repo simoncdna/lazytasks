@@ -43,7 +43,7 @@ impl App {
             Err(err) => (vec![], Some(err.to_string())),
         };
 
-        App {
+        let mut app = App {
             exit: false,
             selected_tasks: Vec::new(),
             state,
@@ -51,7 +51,10 @@ impl App {
             tasks,
             spaces,
             error: space_err,
-        }
+        };
+
+        app.state.spaces_tree_state.select_first();
+        app
     }
 
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> Result<()> {
@@ -114,6 +117,13 @@ impl App {
                 is_archived,
             }) => {
                 components::modals::archive_space::render(frame, selected_option, *is_archived);
+            }
+            Some(ModalState::MoveTask {
+                task_id: _,
+                selected_option,
+            }) => {
+                let spaces: Vec<_> = self.spaces.iter().filter(|s| !s.archived).cloned().collect();
+                components::modals::move_task::render(frame, selected_option, &spaces);
             }
             None => {}
         }
