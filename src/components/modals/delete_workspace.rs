@@ -7,7 +7,7 @@ use ratatui::{
 use crate::components::shared;
 
 pub fn render(frame: &mut Frame, selected_option: &mut ListState) {
-    let area = shared::modal::Modal::new("Delete space")
+    let area = shared::modal::Modal::new("Delete workspace")
         .height(4)
         .render(frame);
     let list_items: Vec<ListItem> = vec![ListItem::from("Delete"), ListItem::from("Cancel")];

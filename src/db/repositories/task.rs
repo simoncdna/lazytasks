@@ -10,18 +10,18 @@ pub struct TaskRepository;
 
 impl TaskRepository {
     pub fn create(connection: &Connection, task: &Task) -> Result<(), rusqlite::Error> {
-        let space_id = match &task.space_id {
+        let workspace_id = match &task.workspace_id {
             Some(v) => Some(Uuid::to_string(v)),
             None => None,
         };
 
         connection.execute(
-            "INSERT INTO tasks (id, title, created_at, space_id) VALUES (?1, ?2, ?3, ?4) ",
+            "INSERT INTO tasks (id, title, created_at, workspace_id) VALUES (?1, ?2, ?3, ?4) ",
             (
                 task.id.to_string(),
                 &task.title,
                 task.created_at.to_rfc3339(),
-                space_id,
+                workspace_id,
             ),
         )?;
 
@@ -80,7 +80,7 @@ impl TaskRepository {
 
     fn parse_row(row: &Row) -> Result<Task, Box<dyn Error>> {
         let id: String = row.get("id")?;
-        let space_id: Option<String> = row.get("space_id")?;
+        let workspace_id: Option<String> = row.get("workspace_id")?;
         let priority: Option<String> = row.get("priority")?;
         let created_at: String = row.get("created_at")?;
         let updated_at: Option<String> = row.get("updated_at")?;
@@ -100,7 +100,7 @@ impl TaskRepository {
             archived_at: archived_at
                 .map(|s| DateTime::parse_from_rfc3339(&s).map(|d| d.with_timezone(&Utc)))
                 .transpose()?,
-            space_id: space_id.map(|s| Uuid::parse_str(&s)).transpose()?,
+            workspace_id: workspace_id.map(|s| Uuid::parse_str(&s)).transpose()?,
         })
     }
 }

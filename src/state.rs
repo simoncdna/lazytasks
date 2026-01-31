@@ -14,8 +14,8 @@ pub struct AppState {
     /// State of the focus pane
     pub active_panel: PanelState,
 
-    /// State of the spaces tree (identifier = UUID as String)
-    pub spaces_tree_state: TreeState<String>,
+    /// State of the workspaces tree (identifier = UUID as String)
+    pub workspaces_tree_state: TreeState<String>,
 
     /// State of the current active modal (CreateTask, EditTask, ArchivedTask, DeleteTask)
     pub active_modal: Option<ModalState>,
@@ -31,7 +31,7 @@ pub enum PanelState {
 pub enum ModalState {
     CreateTask {
         input: Input,
-        space_id: String,
+        workspace_id: String,
     },
     EditTask {
         task_id: Uuid,
@@ -50,15 +50,15 @@ pub enum ModalState {
         task_ids: Vec<Uuid>,
         selected_option: ListState,
     },
-    CreateSpace {
+    CreateWorkspace {
         input: Input,
     },
-    DeleteSpace {
-        space_id: Uuid,
+    DeleteWorkspace {
+        workspace_id: Uuid,
         selected_option: ListState,
     },
-    ArchiveSpace {
-        space_id: Uuid,
+    ArchiveWorkspace {
+        workspace_id: Uuid,
         selected_option: ListState,
         is_archived: bool,
     },
@@ -76,15 +76,15 @@ impl AppState {
         let mut archived_tasks_state = ListState::default();
         archived_tasks_state.select(Some(0));
 
-        let mut spaces_tree_state = TreeState::default();
-        spaces_tree_state.select_first();
+        let mut workspaces_tree_state = TreeState::default();
+        workspaces_tree_state.select_first();
 
         AppState {
             active_tasks_state,
             archived_tasks_state,
             active_panel: PanelState::ActiveTasks,
             active_modal: None,
-            spaces_tree_state,
+            workspaces_tree_state,
         }
     }
 
@@ -122,10 +122,10 @@ impl AppState {
         }
     }
 
-    pub fn open_create_task(&mut self, space_id: String) {
+    pub fn open_create_task(&mut self, workspace_id: String) {
         self.active_modal = Some(ModalState::CreateTask {
             input: Input::default(),
-            space_id,
+            workspace_id,
         })
     }
 
@@ -172,8 +172,8 @@ impl AppState {
         }
     }
 
-    pub fn open_create_space(&mut self) {
-        self.active_modal = Some(ModalState::CreateSpace {
+    pub fn open_create_workspace(&mut self) {
+        self.active_modal = Some(ModalState::CreateWorkspace {
             input: Input::default(),
         })
     }
@@ -182,20 +182,20 @@ impl AppState {
         self.active_modal = None
     }
 
-    pub fn open_delete_space(&mut self, space_id: Uuid) {
+    pub fn open_delete_workspace(&mut self, workspace_id: Uuid) {
         let mut option_list_state = ListState::default();
         option_list_state.select(Some(0));
-        self.active_modal = Some(ModalState::DeleteSpace {
-            space_id,
+        self.active_modal = Some(ModalState::DeleteWorkspace {
+            workspace_id,
             selected_option: option_list_state,
         })
     }
 
-    pub fn open_archive_space(&mut self, space_id: Uuid, is_archived: bool) {
+    pub fn open_archive_workspace(&mut self, workspace_id: Uuid, is_archived: bool) {
         let mut option_list_state = ListState::default();
         option_list_state.select(Some(0));
-        self.active_modal = Some(ModalState::ArchiveSpace {
-            space_id,
+        self.active_modal = Some(ModalState::ArchiveWorkspace {
+            workspace_id,
             selected_option: option_list_state,
             is_archived,
         })

@@ -3,35 +3,35 @@ use uuid::Uuid;
 
 use crate::{
     app::App,
-    db::repositories::{SpaceRepository, TaskRepository},
+    db::repositories::{WorkspaceRepository, TaskRepository},
 };
 
-pub fn archive_space(app: &mut App, option_idx: Option<usize>, space_id: Uuid) {
+pub fn archive_workspace(app: &mut App, option_idx: Option<usize>, workspace_id: Uuid) {
     if option_idx != Some(0) {
         return;
     }
 
-    let space = match app.spaces.iter_mut().find(|s| s.id == space_id) {
+    let workspace = match app.workspaces.iter_mut().find(|s| s.id == workspace_id) {
         Some(s) => s,
         None => return,
     };
 
-    space.archived = !space.archived;
-    space.archived_at = if space.archived {
+    workspace.archived = !workspace.archived;
+    workspace.archived_at = if workspace.archived {
         Some(Utc::now())
     } else {
         None
     };
-    space.updated_at = Some(Utc::now());
+    workspace.updated_at = Some(Utc::now());
 
-    if let Err(e) = SpaceRepository::update(&app.db.connection, space) {
+    if let Err(e) = WorkspaceRepository::update(&app.db.connection, workspace) {
         app.error = Some(e.to_string());
         return;
     }
 
-    let is_archived = space.archived;
+    let is_archived = workspace.archived;
 
-    for task in app.tasks.iter_mut().filter(|t| t.space_id == Some(space_id)) {
+    for task in app.tasks.iter_mut().filter(|t| t.workspace_id == Some(workspace_id)) {
         task.archived = is_archived;
         task.archived_at = if is_archived { Some(Utc::now()) } else { None };
         task.updated_at = Some(Utc::now());
@@ -43,5 +43,5 @@ pub fn archive_space(app: &mut App, option_idx: Option<usize>, space_id: Uuid) {
     }
 
     app.selected_tasks.clear();
-    app.state.spaces_tree_state.select_first();
+    app.state.workspaces_tree_state.select_first();
 }

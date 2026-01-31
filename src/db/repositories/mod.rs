@@ -1,5 +1,5 @@
-pub mod space;
 pub mod task;
+pub mod workspace;
 
-pub use space::SpaceRepository;
 pub use task::TaskRepository;
+pub use workspace::WorkspaceRepository;

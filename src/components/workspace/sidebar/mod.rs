@@ -1,5 +1,5 @@
 pub mod about;
-pub mod active_spaces;
+pub mod active_workspaces;
 pub mod active_tasks;
 pub mod archived_tasks;
 
@@ -34,6 +34,6 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
 
     sidebar::about::render(frame, sidebar[0], app);
     // sidebar::active_tasks::render(frame, sidebar[1], app, active_tasks);
-    sidebar::active_spaces::render(frame, sidebar[1], app);
+    sidebar::active_workspaces::render(frame, sidebar[1], app);
     sidebar::archived_tasks::render(frame, sidebar[2], app, archived_tasks);
 }

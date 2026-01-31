@@ -28,8 +28,8 @@ impl Db {
     }
 
     fn init_schema(&self) -> Result<(), rusqlite::Error> {
-        let spaces_schema = include_str!("schema/spaces.sql");
-        self.connection.execute_batch(spaces_schema)?;
+        let workspaces_schema = include_str!("schema/workspaces.sql");
+        self.connection.execute_batch(workspaces_schema)?;
 
         let tasks_schema = include_str!("schema/tasks.sql");
         self.connection.execute_batch(tasks_schema)?;

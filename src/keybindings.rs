@@ -11,14 +11,14 @@ use crate::{app::App, state::ModalState};
 pub fn handle_key_event(app: &mut App, event: &Event, terminal: &mut DefaultTerminal) {
     if let crossterm::event::Event::Key(key) = event {
         match &mut app.state.active_modal {
-            Some(ModalState::CreateTask { input, space_id }) => match key.code {
+            Some(ModalState::CreateTask { input, workspace_id }) => match key.code {
                 crossterm::event::KeyCode::Esc => actions::close_modal(app),
                 crossterm::event::KeyCode::Enter => {
                     let title = input.value().trim().to_owned();
-                    let space_id = space_id.clone();
+                    let workspace_id = workspace_id.clone();
 
                     if !title.is_empty() {
-                        actions::create_task(app, title, space_id);
+                        actions::create_task(app, title, workspace_id);
                     }
                     actions::close_modal(app);
                 }
@@ -100,13 +100,13 @@ pub fn handle_key_event(app: &mut App, event: &Event, terminal: &mut DefaultTerm
                 }
                 _ => {}
             },
-            Some(ModalState::CreateSpace { input }) => match key.code {
+            Some(ModalState::CreateWorkspace { input }) => match key.code {
                 crossterm::event::KeyCode::Esc => actions::close_modal(app),
                 crossterm::event::KeyCode::Enter => {
                     let title = input.value().trim().to_owned();
 
                     if !title.is_empty() {
-                        actions::create_space(app, title);
+                        actions::create_workspace(app, title);
                     }
                     actions::close_modal(app);
                 }
@@ -114,16 +114,16 @@ pub fn handle_key_event(app: &mut App, event: &Event, terminal: &mut DefaultTerm
                     input.handle_event(event);
                 }
             },
-            Some(ModalState::DeleteSpace {
-                space_id,
+            Some(ModalState::DeleteWorkspace {
+                workspace_id,
                 selected_option,
             }) => match key.code {
                 crossterm::event::KeyCode::Esc => actions::close_modal(app),
                 crossterm::event::KeyCode::Enter => {
                     let option_idx = selected_option.selected();
-                    let space_id = *space_id;
+                    let workspace_id = *workspace_id;
 
-                    actions::delete_space(app, option_idx, space_id);
+                    actions::delete_workspace(app, option_idx, workspace_id);
                     actions::close_modal(app);
                 }
                 crossterm::event::KeyCode::Char('j') => {
@@ -134,17 +134,17 @@ pub fn handle_key_event(app: &mut App, event: &Event, terminal: &mut DefaultTerm
                 }
                 _ => {}
             },
-            Some(ModalState::ArchiveSpace {
-                space_id,
+            Some(ModalState::ArchiveWorkspace {
+                workspace_id,
                 selected_option,
                 is_archived: _,
             }) => match key.code {
                 crossterm::event::KeyCode::Esc => actions::close_modal(app),
                 crossterm::event::KeyCode::Enter => {
                     let option_idx = selected_option.selected();
-                    let space_id = *space_id;
+                    let workspace_id = *workspace_id;
 
-                    actions::archive_space(app, option_idx, space_id);
+                    actions::archive_workspace(app, option_idx, workspace_id);
                     actions::close_modal(app);
                 }
                 crossterm::event::KeyCode::Char('j') => {
@@ -163,9 +163,9 @@ pub fn handle_key_event(app: &mut App, event: &Event, terminal: &mut DefaultTerm
                 crossterm::event::KeyCode::Enter => {
                     let option_idx = selected_option.selected();
                     let task_id = *task_id;
-                    let spaces: Vec<_> = app.spaces.iter().filter(|s| !s.archived).cloned().collect();
+                    let workspaces: Vec<_> = app.workspaces.iter().filter(|s| !s.archived).cloned().collect();
 
-                    actions::move_task(app, option_idx, task_id, &spaces);
+                    actions::move_task(app, option_idx, task_id, &workspaces);
                     actions::close_modal(app);
                 }
                 crossterm::event::KeyCode::Char('j') => {
@@ -179,14 +179,14 @@ pub fn handle_key_event(app: &mut App, event: &Event, terminal: &mut DefaultTerm
             None => match key.code {
                 crossterm::event::KeyCode::Char('a') => {
                     if app.state.active_panel == PanelState::ActiveTasks {
-                        actions::open_archive_space_modal(app);
+                        actions::open_archive_workspace_modal(app);
                     }
                     if app.state.active_modal.is_none() {
                         actions::open_archive_modal(app);
                     }
                 }
                 crossterm::event::KeyCode::Char('c') => actions::open_create_task_modal(app),
-                crossterm::event::KeyCode::Char('s') => actions::open_create_space_modal(app),
+                crossterm::event::KeyCode::Char('s') => actions::open_create_workspace_modal(app),
                 crossterm::event::KeyCode::Char('e') => actions::open_edit_title_modal(app),
                 crossterm::event::KeyCode::Char('p') => actions::open_priority_modal(app),
                 crossterm::event::KeyCode::Char('E') => actions::edit_task(app, terminal),
@@ -195,7 +195,7 @@ pub fn handle_key_event(app: &mut App, event: &Event, terminal: &mut DefaultTerm
                 crossterm::event::KeyCode::Char('m') => actions::open_move_task_modal(app),
                 crossterm::event::KeyCode::Char('d') => {
                     if app.state.active_panel == PanelState::ActiveTasks {
-                        actions::open_delete_space_modal(app);
+                        actions::open_delete_workspace_modal(app);
                     }
                     if app.state.active_modal.is_none() {
                         actions::open_delete_modal(app);
@@ -204,7 +204,7 @@ pub fn handle_key_event(app: &mut App, event: &Event, terminal: &mut DefaultTerm
                 crossterm::event::KeyCode::Char('j') => {
                     match app.state.active_panel {
                         PanelState::ActiveTasks => {
-                            TreeState::key_down(&mut app.state.spaces_tree_state);
+                            TreeState::key_down(&mut app.state.workspaces_tree_state);
                         }
                         _ => actions::select_next_task(app),
                     };
@@ -212,7 +212,7 @@ pub fn handle_key_event(app: &mut App, event: &Event, terminal: &mut DefaultTerm
                 crossterm::event::KeyCode::Char('k') => {
                     match app.state.active_panel {
                         PanelState::ActiveTasks => {
-                            TreeState::key_up(&mut app.state.spaces_tree_state);
+                            TreeState::key_up(&mut app.state.workspaces_tree_state);
                         }
                         _ => actions::select_previous_task(app),
                     };
@@ -224,8 +224,8 @@ pub fn handle_key_event(app: &mut App, event: &Event, terminal: &mut DefaultTerm
                         if app.error.is_some() {
                             actions::clean_err_msg(app);
                         } else {
-                            let selected = app.state.spaces_tree_state.selected().to_vec();
-                            TreeState::toggle(&mut app.state.spaces_tree_state, selected);
+                            let selected = app.state.workspaces_tree_state.selected().to_vec();
+                            TreeState::toggle(&mut app.state.workspaces_tree_state, selected);
                         }
                     }
                     _ => actions::clean_err_msg(app),

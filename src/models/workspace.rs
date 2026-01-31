@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 #[derive(Clone)]
-pub struct Space {
+pub struct Workspace {
     pub id: Uuid,
     pub title: String,
     pub archived: bool,
@@ -11,9 +11,9 @@ pub struct Space {
     pub archived_at: Option<DateTime<Utc>>,
 }
 
-impl Space {
+impl Workspace {
     pub fn new(title: impl Into<String>) -> Self {
-        Space {
+        Workspace {
             id: Uuid::new_v4(),
             title: title.into(),
             archived: false,
@@ -22,6 +22,4 @@ impl Space {
             archived_at: None,
         }
     }
-
-    pub fn get_all() {}
 }

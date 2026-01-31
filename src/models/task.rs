@@ -14,11 +14,11 @@ pub struct Task {
     pub created_at: DateTime<Utc>,
     pub updated_at: Option<DateTime<Utc>>,
     pub archived_at: Option<DateTime<Utc>>,
-    pub space_id: Option<Uuid>,
+    pub workspace_id: Option<Uuid>,
 }
 
 impl Task {
-    pub fn new(title: impl Into<String>, space_id: String) -> Self {
+    pub fn new(title: impl Into<String>, workspace_id: String) -> Self {
         Task {
             id: Uuid::new_v4(),
             title: title.into(),
@@ -29,7 +29,7 @@ impl Task {
             created_at: Utc::now(),
             updated_at: None,
             archived_at: None,
-            space_id: Some(Uuid::parse_str(&space_id).unwrap()),
+            workspace_id: Some(Uuid::parse_str(&workspace_id).unwrap()),
         }
     }
 

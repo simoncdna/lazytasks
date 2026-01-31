@@ -4,19 +4,19 @@ use ratatui::{
     widgets::{List, ListItem, ListState},
 };
 
-use crate::{components::shared, models::Space};
+use crate::{components::shared, models::Workspace};
 
-pub fn render(frame: &mut Frame, selected_option: &mut ListState, spaces: &[Space]) {
-    let height = (spaces.len() + 3).max(3).min(10) as u16;
-    let area = shared::modal::Modal::new("Move to space")
+pub fn render(frame: &mut Frame, selected_option: &mut ListState, workspaces: &[Workspace]) {
+    let height = (workspaces.len() + 3).max(3).min(10) as u16;
+    let area = shared::modal::Modal::new("Move to workspace")
         .height(height)
         .render(frame);
 
-    let mut list_items: Vec<ListItem> = spaces
+    let mut list_items: Vec<ListItem> = workspaces
         .iter()
-        .map(|s| ListItem::from(s.title.clone()))
+        .map(|w| ListItem::from(w.title.clone()))
         .collect();
-    list_items.push(ListItem::from("No space"));
+    list_items.push(ListItem::from("No workspace"));
 
     let options = List::new(list_items).highlight_style(
         Style::default()

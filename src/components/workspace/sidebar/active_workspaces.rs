@@ -19,26 +19,26 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
         Color::White
     };
 
-    for space in app.spaces.iter().filter(|s| !s.archived) {
-        let space_tasks: Vec<TreeItem<String>> = app
+    for workspace in app.workspaces.iter().filter(|w| !w.archived) {
+        let workspace_tasks: Vec<TreeItem<String>> = app
             .tasks
             .iter()
-            .filter(|t| t.space_id == Some(space.id) && !t.archived)
+            .filter(|t| t.workspace_id == Some(workspace.id) && !t.archived)
             .map(|task| TreeItem::new_leaf(task.id.to_string(), task.title.clone()))
             .collect();
 
-        let space_item = TreeItem::new(
-            space.id.to_string(),
-            format!("{} ({})", space.title.clone(), space_tasks.len()),
-            space_tasks,
+        let workspace_item = TreeItem::new(
+            workspace.id.to_string(),
+            format!("{} ({})", workspace.title.clone(), workspace_tasks.len()),
+            workspace_tasks,
         )
         .unwrap();
 
-        items.push(space_item);
+        items.push(workspace_item);
     }
 
     for task in &app.tasks {
-        if task.space_id.is_none() && !task.archived {
+        if task.workspace_id.is_none() && !task.archived {
             items.push(TreeItem::new_leaf(task.id.to_string(), task.title.clone()));
         }
     }
@@ -47,7 +47,7 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
         .expect("identifiers are unique")
         .block(
             Block::new()
-                .title(" Spaces ")
+                .title(" Workspaces ")
                 .borders(Borders::ALL)
                 .border_type(BorderType::Rounded)
                 .border_style(border_color),
@@ -63,11 +63,11 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
         .node_open_symbol("▼ ")
         .node_no_children_symbol("  ");
 
-    frame.render_stateful_widget(tree, area, &mut app.state.spaces_tree_state);
+    frame.render_stateful_widget(tree, area, &mut app.state.workspaces_tree_state);
     shared::scrollbar::render(
         frame,
         area,
-        app.spaces.len(),
+        app.workspaces.len(),
         app.state.active_tasks_state.offset(),
     );
 }

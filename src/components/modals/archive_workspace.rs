@@ -8,7 +8,7 @@ use crate::components::shared;
 
 pub fn render(frame: &mut Frame, selected_option: &mut ListState, is_archived: bool) {
     let action_name = if is_archived { "Unarchive" } else { "Archive" };
-    let area = shared::modal::Modal::new(format!("{} space", action_name))
+    let area = shared::modal::Modal::new(format!("{} workspace", action_name))
         .height(4)
         .render(frame);
     let list_items: Vec<ListItem> = vec![ListItem::from(action_name), ListItem::from("Cancel")];

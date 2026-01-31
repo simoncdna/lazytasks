@@ -1,7 +1,7 @@
 use crate::{app::App, db::repositories::TaskRepository, models};
 
-pub fn create_task(app: &mut App, title: String, space_id: String) {
-    let new_task = models::Task::new(title, space_id);
+pub fn create_task(app: &mut App, title: String, workspace_id: String) {
+    let new_task = models::Task::new(title, workspace_id);
 
     if let Err(e) = TaskRepository::create(&app.db.connection, &new_task) {
         app.error = Some(e.to_string());

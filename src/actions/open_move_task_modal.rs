@@ -7,7 +7,7 @@ pub fn open_move_task_modal(app: &mut App) {
         return;
     }
 
-    let selected = app.state.spaces_tree_state.selected();
+    let selected = app.state.workspaces_tree_state.selected();
     if selected.is_empty() {
         return;
     }

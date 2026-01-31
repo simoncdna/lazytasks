@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS tasks (
     created_at TEXT NOT NULL,
     updated_at TEXT,
     archived_at TEXT,
-		space_id TEXT,
+		workspace_id TEXT,
 
-		FOREIGN KEY(space_id) REFERENCES spaces(id)
+		FOREIGN KEY(workspace_id) REFERENCES workspaces(id)
 );

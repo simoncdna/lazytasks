@@ -9,7 +9,7 @@ pub fn open_delete_modal(app: &mut App) {
     }
 
     if app.state.active_panel == PanelState::ActiveTasks {
-        let selected = app.state.spaces_tree_state.selected();
+        let selected = app.state.workspaces_tree_state.selected();
         if selected.is_empty() {
             return;
         }
