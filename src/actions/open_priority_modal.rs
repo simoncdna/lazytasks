@@ -1,20 +1,26 @@
+use uuid::Uuid;
+
 use crate::{app::App, state::PanelState};
 
 pub fn open_priority_modal(app: &mut App) {
-    let is_active_tasks = app.state.active_panel == PanelState::ActiveTasks;
+    if app.state.active_panel != PanelState::ActiveTasks {
+        return;
+    }
 
-    if is_active_tasks {
-        if app.selected_tasks.is_empty() {
-            if let Some(task_index) = app
-                .state
-                .get_selected_panel_state()
-                .and_then(|s| s.selected())
-            {
-                let task_id = app.get_current_tasks()[task_index].id;
-                app.state.open_priority_task(vec![task_id]);
-            }
-        } else {
-            app.state.open_priority_task(app.selected_tasks.clone());
+    if !app.selected_tasks.is_empty() {
+        app.state.open_priority_task(app.selected_tasks.clone());
+        return;
+    }
+
+    let selected = app.state.workspaces_tree_state.selected();
+    if selected.is_empty() {
+        return;
+    }
+
+    let selected_id = selected.last().unwrap();
+    if let Ok(uuid) = Uuid::parse_str(selected_id) {
+        if app.tasks.iter().any(|t| t.id == uuid) {
+            app.state.open_priority_task(vec![uuid]);
         }
     }
 }

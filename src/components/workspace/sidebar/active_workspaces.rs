@@ -2,11 +2,12 @@ use ratatui::{
     Frame,
     layout::Rect,
     style::{Color, Modifier, Style},
+    text::{Line, Span},
     widgets::{Block, BorderType, Borders},
 };
 use tui_tree_widget::{Tree, TreeItem};
 
-use crate::{app::App, components::shared, state::PanelState};
+use crate::{app::App, components::shared, models::Task, state::PanelState};
 
 pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
     let is_active =
@@ -20,11 +21,26 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
     };
 
     for workspace in app.workspaces.iter().filter(|w| !w.archived) {
-        let workspace_tasks: Vec<TreeItem<String>> = app
+        let mut tasks_in_workspace: Vec<Task> = app
             .tasks
             .iter()
             .filter(|t| t.workspace_id == Some(workspace.id) && !t.archived)
-            .map(|task| TreeItem::new_leaf(task.id.to_string(), task.title.clone()))
+            .cloned()
+            .collect();
+        Task::sort_by_priority(&mut tasks_in_workspace);
+
+        let workspace_tasks: Vec<TreeItem<String>> = tasks_in_workspace
+            .iter()
+            .map(|task| {
+                let line = match &task.priority {
+                    Some(p) => Line::from(vec![
+                        Span::styled(format!("{} ", p.label()), Style::default().fg(p.color())),
+                        Span::raw(task.title.clone()),
+                    ]),
+                    None => Line::from(task.title.clone()),
+                };
+                TreeItem::new_leaf(task.id.to_string(), line)
+            })
             .collect();
 
         let workspace_item = TreeItem::new(
@@ -37,10 +53,23 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
         items.push(workspace_item);
     }
 
-    for task in &app.tasks {
-        if task.workspace_id.is_none() && !task.archived {
-            items.push(TreeItem::new_leaf(task.id.to_string(), task.title.clone()));
-        }
+    let mut orphan_tasks: Vec<Task> = app
+        .tasks
+        .iter()
+        .filter(|t| t.workspace_id.is_none() && !t.archived)
+        .cloned()
+        .collect();
+    Task::sort_by_priority(&mut orphan_tasks);
+
+    for task in &orphan_tasks {
+        let line = match &task.priority {
+            Some(p) => Line::from(vec![
+                Span::styled(format!("{} ", p.label()), Style::default().fg(p.color())),
+                Span::raw(task.title.clone()),
+            ]),
+            None => Line::from(task.title.clone()),
+        };
+        items.push(TreeItem::new_leaf(task.id.to_string(), line));
     }
 
     let tree = Tree::new(&items)
