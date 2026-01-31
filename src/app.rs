@@ -75,7 +75,7 @@ impl App {
 
         match &mut self.state.active_modal {
             Some(ModalState::CreateTask { input, workspace_id: _ }) => {
-                components::modals::create_task::render(frame, input);
+                components::modals::create_task::render(frame, input, "Create task");
             }
             Some(ModalState::EditTask { task_id: _, input }) => {
                 components::modals::edit_task::render(frame, input);
@@ -100,7 +100,7 @@ impl App {
                 components::modals::priority_task::render(frame, selected_option);
             }
             Some(ModalState::CreateWorkspace { input }) => {
-                components::modals::create_task::render(frame, input);
+                components::modals::create_task::render(frame, input, "Create workspace");
             }
             Some(ModalState::DeleteWorkspace {
                 workspace_id: _,

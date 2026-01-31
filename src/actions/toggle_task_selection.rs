@@ -20,6 +20,31 @@ pub fn toggle_task_selection(app: &mut App) {
             } else {
                 app.selected_tasks.push(uuid);
             }
+            return;
+        }
+
+        if app.workspaces.iter().any(|w| w.id == uuid) {
+            let workspace_task_ids: Vec<Uuid> = app
+                .tasks
+                .iter()
+                .filter(|t| t.workspace_id == Some(uuid) && !t.archived)
+                .map(|t| t.id)
+                .collect();
+
+            let all_selected = workspace_task_ids
+                .iter()
+                .all(|id| app.selected_tasks.contains(id));
+
+            if all_selected {
+                app.selected_tasks
+                    .retain(|id| !workspace_task_ids.contains(id));
+            } else {
+                for task_id in workspace_task_ids {
+                    if !app.selected_tasks.contains(&task_id) {
+                        app.selected_tasks.push(task_id);
+                    }
+                }
+            }
         }
     }
 }

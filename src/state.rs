@@ -31,7 +31,7 @@ pub enum PanelState {
 pub enum ModalState {
     CreateTask {
         input: Input,
-        workspace_id: String,
+        workspace_id: Option<Uuid>,
     },
     EditTask {
         task_id: Uuid,
@@ -122,7 +122,7 @@ impl AppState {
         }
     }
 
-    pub fn open_create_task(&mut self, workspace_id: String) {
+    pub fn open_create_task(&mut self, workspace_id: Option<Uuid>) {
         self.active_modal = Some(ModalState::CreateTask {
             input: Input::default(),
             workspace_id,

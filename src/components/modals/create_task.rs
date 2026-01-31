@@ -3,8 +3,8 @@ use tui_input::Input;
 
 use crate::components::shared;
 
-pub fn render(frame: &mut Frame, input_state: &Input) {
-    let area = shared::modal::Modal::new("Create task")
+pub fn render(frame: &mut Frame, input_state: &Input, title: &str) {
+    let area = shared::modal::Modal::new(title)
         .height(3)
         .render(frame);
     let width = area.width.saturating_sub(2) as usize;

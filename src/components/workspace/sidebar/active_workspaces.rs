@@ -32,23 +32,38 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
         let workspace_tasks: Vec<TreeItem<String>> = tasks_in_workspace
             .iter()
             .map(|task| {
+                let is_selected = app.selected_tasks.contains(&task.id);
+                let title_style = if is_selected {
+                    Style::default().fg(Color::LightGreen)
+                } else {
+                    Style::default()
+                };
+
                 let line = match &task.priority {
                     Some(p) => Line::from(vec![
                         Span::styled(format!("{} ", p.label()), Style::default().fg(p.color())),
-                        Span::raw(task.title.clone()),
+                        Span::styled(task.title.clone(), title_style),
                     ]),
-                    None => Line::from(task.title.clone()),
+                    None => Line::from(Span::styled(task.title.clone(), title_style)),
                 };
                 TreeItem::new_leaf(task.id.to_string(), line)
             })
             .collect();
 
-        let workspace_item = TreeItem::new(
-            workspace.id.to_string(),
-            format!("{} ({})", workspace.title.clone(), workspace_tasks.len()),
-            workspace_tasks,
-        )
-        .unwrap();
+        let workspace_task_ids: Vec<_> = tasks_in_workspace.iter().map(|t| t.id).collect();
+        let all_selected =
+            !workspace_task_ids.is_empty() && workspace_task_ids.iter().all(|id| app.selected_tasks.contains(id));
+
+        let workspace_title = if all_selected {
+            Line::from(Span::styled(
+                format!("{} ({})", workspace.title.clone(), workspace_tasks.len()),
+                Style::default().fg(Color::LightGreen),
+            ))
+        } else {
+            Line::from(format!("{} ({})", workspace.title.clone(), workspace_tasks.len()))
+        };
+
+        let workspace_item = TreeItem::new(workspace.id.to_string(), workspace_title, workspace_tasks).unwrap();
 
         items.push(workspace_item);
     }
@@ -62,12 +77,19 @@ pub fn render(frame: &mut Frame, area: Rect, app: &mut App) {
     Task::sort_by_priority(&mut orphan_tasks);
 
     for task in &orphan_tasks {
+        let is_selected = app.selected_tasks.contains(&task.id);
+        let title_style = if is_selected {
+            Style::default().fg(Color::LightGreen)
+        } else {
+            Style::default()
+        };
+
         let line = match &task.priority {
             Some(p) => Line::from(vec![
                 Span::styled(format!("{} ", p.label()), Style::default().fg(p.color())),
-                Span::raw(task.title.clone()),
+                Span::styled(task.title.clone(), title_style),
             ]),
-            None => Line::from(task.title.clone()),
+            None => Line::from(Span::styled(task.title.clone(), title_style)),
         };
         items.push(TreeItem::new_leaf(task.id.to_string(), line));
     }

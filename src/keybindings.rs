@@ -186,7 +186,7 @@ pub fn handle_key_event(app: &mut App, event: &Event, terminal: &mut DefaultTerm
                     }
                 }
                 crossterm::event::KeyCode::Char('c') => actions::open_create_task_modal(app),
-                crossterm::event::KeyCode::Char('s') => actions::open_create_workspace_modal(app),
+                crossterm::event::KeyCode::Char('w') => actions::open_create_workspace_modal(app),
                 crossterm::event::KeyCode::Char('e') => actions::open_edit_title_modal(app),
                 crossterm::event::KeyCode::Char('p') => actions::open_priority_modal(app),
                 crossterm::event::KeyCode::Char('E') => actions::edit_task(app, terminal),

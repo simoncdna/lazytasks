@@ -1,6 +1,8 @@
+use uuid::Uuid;
+
 use crate::{app::App, db::repositories::TaskRepository, models};
 
-pub fn create_task(app: &mut App, title: String, workspace_id: String) {
+pub fn create_task(app: &mut App, title: String, workspace_id: Option<Uuid>) {
     let new_task = models::Task::new(title, workspace_id);
 
     if let Err(e) = TaskRepository::create(&app.db.connection, &new_task) {
