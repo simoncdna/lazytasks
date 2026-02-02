@@ -8,7 +8,10 @@ use uuid::Uuid;
 
 use crate::{
     components,
-    db::{Db, repositories::TaskRepository},
+    db::{
+        Db,
+        repositories::{WorkspaceRepository, TaskRepository},
+    },
     keybindings::handle_key_event,
     models::Task,
     state,
@@ -17,6 +20,7 @@ use crate::{models, state::ModalState};
 
 pub struct App {
     pub exit: bool,
+    pub workspaces: Vec<models::Workspace>,
     pub tasks: Vec<models::Task>,
     pub selected_tasks: Vec<Uuid>,
     pub state: state::AppState,
@@ -29,8 +33,13 @@ impl App {
         let state = state::AppState::new();
         let db = Db::new();
 
-        let (tasks, error) = match TaskRepository::get_all(&db.connection) {
+        let (tasks, _) = match TaskRepository::get_all(&db.connection) {
             Ok(tasks) => (tasks, None),
+            Err(err) => (vec![], Some(err.to_string())),
+        };
+
+        let (workspaces, workspace_err) = match WorkspaceRepository::get_all(&db.connection) {
+            Ok(workspaces) => (workspaces, None),
             Err(err) => (vec![], Some(err.to_string())),
         };
 
@@ -40,7 +49,8 @@ impl App {
             state,
             db,
             tasks,
-            error,
+            workspaces,
+            error: workspace_err,
         }
     }
 
@@ -64,8 +74,8 @@ impl App {
         components::bottom_bar::render(frame, layout[1], self);
 
         match &mut self.state.active_modal {
-            Some(ModalState::CreateTask { input }) => {
-                components::modals::create_task::render(frame, input);
+            Some(ModalState::CreateTask { input, workspace_id: _ }) => {
+                components::modals::create_task::render(frame, input, "Create task");
             }
             Some(ModalState::EditTask { task_id: _, input }) => {
                 components::modals::edit_task::render(frame, input);
@@ -88,6 +98,29 @@ impl App {
                 selected_option,
             }) => {
                 components::modals::priority_task::render(frame, selected_option);
+            }
+            Some(ModalState::CreateWorkspace { input }) => {
+                components::modals::create_task::render(frame, input, "Create workspace");
+            }
+            Some(ModalState::DeleteWorkspace {
+                workspace_id: _,
+                selected_option,
+            }) => {
+                components::modals::delete_workspace::render(frame, selected_option);
+            }
+            Some(ModalState::ArchiveWorkspace {
+                workspace_id: _,
+                selected_option,
+                is_archived,
+            }) => {
+                components::modals::archive_workspace::render(frame, selected_option, *is_archived);
+            }
+            Some(ModalState::MoveTask {
+                task_id: _,
+                selected_option,
+            }) => {
+                let workspaces: Vec<_> = self.workspaces.iter().filter(|s| !s.archived).cloned().collect();
+                components::modals::move_task::render(frame, selected_option, &workspaces);
             }
             None => {}
         }

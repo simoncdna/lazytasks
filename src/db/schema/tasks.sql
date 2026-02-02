@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS tasks (
     priority TEXT,
     created_at TEXT NOT NULL,
     updated_at TEXT,
-    archived_at TEXT
-);
+    archived_at TEXT,
+		workspace_id TEXT,
 
+		FOREIGN KEY(workspace_id) REFERENCES workspaces(id)
+);

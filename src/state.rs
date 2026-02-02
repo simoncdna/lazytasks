@@ -1,5 +1,6 @@
 use ratatui::widgets::ListState;
 use tui_input::Input;
+use tui_tree_widget::TreeState;
 use uuid::Uuid;
 
 /// The application global state
@@ -12,6 +13,9 @@ pub struct AppState {
 
     /// State of the focus pane
     pub active_panel: PanelState,
+
+    /// State of the workspaces tree (identifier = UUID as String)
+    pub workspaces_tree_state: TreeState<String>,
 
     /// State of the current active modal (CreateTask, EditTask, ArchivedTask, DeleteTask)
     pub active_modal: Option<ModalState>,
@@ -27,6 +31,7 @@ pub enum PanelState {
 pub enum ModalState {
     CreateTask {
         input: Input,
+        workspace_id: Option<Uuid>,
     },
     EditTask {
         task_id: Uuid,
@@ -45,6 +50,22 @@ pub enum ModalState {
         task_ids: Vec<Uuid>,
         selected_option: ListState,
     },
+    CreateWorkspace {
+        input: Input,
+    },
+    DeleteWorkspace {
+        workspace_id: Uuid,
+        selected_option: ListState,
+    },
+    ArchiveWorkspace {
+        workspace_id: Uuid,
+        selected_option: ListState,
+        is_archived: bool,
+    },
+    MoveTask {
+        task_id: Uuid,
+        selected_option: ListState,
+    },
 }
 
 impl AppState {
@@ -55,11 +76,15 @@ impl AppState {
         let mut archived_tasks_state = ListState::default();
         archived_tasks_state.select(Some(0));
 
+        let mut workspaces_tree_state = TreeState::default();
+        workspaces_tree_state.select_first();
+
         AppState {
             active_tasks_state,
             archived_tasks_state,
             active_panel: PanelState::ActiveTasks,
             active_modal: None,
+            workspaces_tree_state,
         }
     }
 
@@ -97,9 +122,10 @@ impl AppState {
         }
     }
 
-    pub fn open_create_task(&mut self) {
+    pub fn open_create_task(&mut self, workspace_id: Option<Uuid>) {
         self.active_modal = Some(ModalState::CreateTask {
             input: Input::default(),
+            workspace_id,
         })
     }
 
@@ -146,7 +172,41 @@ impl AppState {
         }
     }
 
+    pub fn open_create_workspace(&mut self) {
+        self.active_modal = Some(ModalState::CreateWorkspace {
+            input: Input::default(),
+        })
+    }
+
     pub fn close_modal(&mut self) {
         self.active_modal = None
+    }
+
+    pub fn open_delete_workspace(&mut self, workspace_id: Uuid) {
+        let mut option_list_state = ListState::default();
+        option_list_state.select(Some(0));
+        self.active_modal = Some(ModalState::DeleteWorkspace {
+            workspace_id,
+            selected_option: option_list_state,
+        })
+    }
+
+    pub fn open_archive_workspace(&mut self, workspace_id: Uuid, is_archived: bool) {
+        let mut option_list_state = ListState::default();
+        option_list_state.select(Some(0));
+        self.active_modal = Some(ModalState::ArchiveWorkspace {
+            workspace_id,
+            selected_option: option_list_state,
+            is_archived,
+        })
+    }
+
+    pub fn open_move_task(&mut self, task_id: Uuid) {
+        let mut option_list_state = ListState::default();
+        option_list_state.select(Some(0));
+        self.active_modal = Some(ModalState::MoveTask {
+            task_id,
+            selected_option: option_list_state,
+        })
     }
 }

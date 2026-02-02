@@ -16,7 +16,7 @@ impl Db {
             fs::create_dir(&data_dir).expect("Couldn't create your data directory")
         }
 
-        let db_path = data_dir.join("tasks.db");
+        let db_path = data_dir.join("lazytasks.db");
 
         let connection = Connection::open(&db_path).expect("Couldn't open database");
 
@@ -28,8 +28,12 @@ impl Db {
     }
 
     fn init_schema(&self) -> Result<(), rusqlite::Error> {
-        let schema = include_str!("schema/tasks.sql");
+        let workspaces_schema = include_str!("schema/workspaces.sql");
+        self.connection.execute_batch(workspaces_schema)?;
 
-        self.connection.execute_batch(schema)
+        let tasks_schema = include_str!("schema/tasks.sql");
+        self.connection.execute_batch(tasks_schema)?;
+
+        Ok(())
     }
 }
